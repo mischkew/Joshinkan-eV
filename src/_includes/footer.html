@@ -44,7 +44,7 @@
         </div>
         <div class="contact-text">
           <span class="icon email"></span>
-          <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;{{ site.data.contact.email }}">{{ site.data.contact.email }}</a>
+          <a href="mailto:{{ site.data.contact.email | encode_email }}">{{ site.data.contact.email_text }}</a>
         </div>
         <div class="contact-text"><span class="icon phone"></span>{{ site.data.contact.phone }}</div>
       </div>
