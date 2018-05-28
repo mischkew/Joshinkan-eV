@@ -17,7 +17,6 @@ header {
   }
 
   .site-header {
-    float: right;
     padding-top: 68px;
   }
 
@@ -34,7 +33,6 @@ header {
   }
 
   .page-links, .contact {
-    text-align: right;
   }
 
   .page-link-wrapper, .contact-text {
@@ -56,12 +54,12 @@ header {
   .contact {
     position: absolute;
     bottom: 0px;
-    right: 0;
+    left: 0;
 
     .icon {
       position: absolute;
       top: 4px;
-      left: -16px;
+      right: -20px;
     }
   }
 
