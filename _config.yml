@@ -18,6 +18,6 @@ sass:
 markdown: kramdown
 
 # Plugins
-gems:
+plugins:
   - jekyll-redirect-from
   - jekyll-email-protect
