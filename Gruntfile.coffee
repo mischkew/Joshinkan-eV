@@ -10,46 +10,53 @@ module.exports = (grunt) ->
 
   grunt.initConfig
 
+    #
+    # Frontend Dependencies
+    # We are currently not using any frontend build system and thus we have to
+    # copy our components into the src folder in order to build the jekyll
+    # setup.
+    #
+
     copy:
       bootstrap:
         files: [{
           expand: true
-          cwd: "src/bower_components/bootstrap-sass/assets/stylesheets/"
+          cwd: "bower_components/bootstrap-sass/assets/stylesheets/"
           src: ["**"]
           dest: "src/_sass/vendor"
         }]
       glyphicons:
         files: [{
           expand: true
-          cwd: "src/bower_components/bootstrap-sass/assets/fonts/"
+          cwd: "bower_components/bootstrap-sass/assets/fonts/"
           src: ["**"]
           dest: "src/fonts"
         }]
       animate:
         files: [{
           expand: true
-          cwd: "src/bower_components/animate-scss/src"
+          cwd: "bower_components/animate-scss/src"
           src: ["**"]
           dest: "src/_sass/vendor/animate"
         }]
       jquery:
         files: [{
           expand: true
-          cwd: "src/bower_components/jquery/dist/"
+          cwd: "bower_components/jquery/dist/"
           src: ["jquery.min.js", "jquery.min.map"]
           dest: "src/javascripts/vendor"
         }]
       miniParallax:
         files: [{
           expand: true
-          cwd: "src/bower_components/mini-parallax/"
+          cwd: "bower_components/mini-parallax/"
           src: ["jquery.mini.parallax.js"]
           dest: "src/javascripts/vendor"
         }]
       wow:
         files: [{
           expand: true
-          cwd: "src/bower_components/wowjs/dist"
+          cwd: "bower_components/wowjs/dist"
           src: ["wow.min.js"]
           dest: "src/javascripts/vendor"
         }]
