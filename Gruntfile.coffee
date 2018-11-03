@@ -72,17 +72,10 @@ module.exports = (grunt) ->
         livereload: true
       source:
         files: [
-          "src/_drafts/**/*"
-          "src/_includes/**/*"
-          "src/_layouts/**/*"
-          "src/_posts/**/*"
-          "src/_sass/**/*"
-          "src/stylesheets/**/*"
-          "src/images/*"
-          "src/javascripts/**/*"
+          "bower_components"
+          "node_modules"
+          "src/**/*"
           "_config.yml"
-          "src/**/*.html"
-          "src/**/*.md"
         ]
         tasks: [
           "exec:jekyll"
