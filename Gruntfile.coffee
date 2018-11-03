@@ -67,6 +67,10 @@ module.exports = (grunt) ->
         cmd: "gem install jekyll:3.8.4 bundler:1.17.1"
       jekyll:
         cmd: "jekyll build --trace"
+      deploy:
+        cmd: "gcloud app deploy --quiet"
+      browse:
+        cmd: "glcoud app browse"
 
     watch:
       options:
@@ -105,6 +109,15 @@ module.exports = (grunt) ->
     "build"
     "connect:server"
     "watch"
+  ]
+
+  grunt.registerTask "deploy", "Deploy the webpage on Google App Engine", [
+    "build"
+    "exec:deploy"
+  ]
+
+  grunt.registerTask "browse", "View the hosted webpage in your default browser", [
+    "exec:browse"
   ]
 
   grunt.registerTask "default", [
