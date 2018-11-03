@@ -1,65 +1,23 @@
 # Joshinkan e.V.
 
-`grunt-cli v1.2.0` (npm i -g grunt-cli)
-`grunt v0.4.5` (should come with npm i)
+## Requirements
 
-`bower 1.8.4` (npm i -g bower)
-`jekyll 3.8.2`
+- [gem > v2.7.6](https://rubygems.org/)
+- NodeJs and npm
 
+## Installation
+
+``` bash
+# Install development and frontend dependencies
+npm install
+
+# Install jekyll for static site generation
+npm run gems
 ```
-addressable (2.5.2)
-bigdecimal (default: 1.3.4)
-bundler (1.16.2, default: 1.16.1)
-cmath (default: 1.0.0)
-colorator (1.1.0)
-concurrent-ruby (1.0.5)
-csv (default: 1.0.0)
-date (default: 1.0.0)
-did_you_mean (1.2.0)
-em-websocket (0.5.1)
-etc (default: 1.0.0)
-eventmachine (1.2.7)
-fcntl (default: 1.0.0)
-ffi (1.9.23)
-fiddle (default: 1.0.0)
-fileutils (default: 1.0.2)
-forwardable-extended (2.6.0)
-http_parser.rb (0.6.0)
-i18n (0.9.5)
-io-console (default: 0.4.6)
-ipaddr (default: 1.2.0)
-jekyll (3.8.2)
-jekyll-email-protect (1.1.0)
-jekyll-redirect-from (0.13.0)
-jekyll-sass-converter (1.5.2)
-jekyll-watch (2.0.0)
-json (default: 2.1.0)
-kramdown (1.16.2)
-liquid (4.0.0)
-listen (3.1.5)
-mercenary (0.3.6)
-minitest (5.10.3)
-net-telnet (0.1.1)
-openssl (default: 2.1.0)
-pathutil (0.16.1)
-power_assert (1.1.1)
-psych (default: 3.0.2)
-public_suffix (3.0.2)
-rake (12.3.0)
-rb-fsevent (0.10.3)
-rb-inotify (0.9.10)
-rdoc (default: 6.0.1)
-rouge (3.1.1)
-ruby_dep (1.5.0)
-safe_yaml (1.0.4)
-sass (3.5.6)
-sass-listen (4.0.0)
-scanf (default: 1.0.0)
-sdbm (default: 1.0.0)
-stringio (default: 0.0.1)
-strscan (default: 1.0.0)
-test-unit (3.2.7)
-webrick (default: 1.4.2)
-xmlrpc (0.3.0)
-zlib (default: 1.0.0)
-```
+
+## Usage
+
+Run the development server via `npm start`. Checkout http://localhost:4000.
+
+Or only build the static site via `npm build`. The site will be generated into
+the `./public` directory.

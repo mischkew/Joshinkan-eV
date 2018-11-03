@@ -9,8 +9,6 @@ url: "http://joshinkan.de" # the base hostname & protocol for your site
 # Build settings
 source: src
 destination: public
-exclude:
-  - bower_components
 sass:
   sass_dir: _sass
   style: :compressed

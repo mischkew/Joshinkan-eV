@@ -10,53 +10,61 @@ module.exports = (grunt) ->
 
   grunt.initConfig
 
+    #
+    # Frontend Dependencies
+    # We are currently not using any frontend build system and thus we have to
+    # copy our components into the src folder in order to build the jekyll
+    # setup.
+    #
+
     copy:
       bootstrap:
         files: [{
           expand: true
-          cwd: "src/bower_components/bootstrap-sass/assets/stylesheets/"
+          cwd: "node_modules/bootstrap-sass/assets/stylesheets/"
           src: ["**"]
           dest: "src/_sass/vendor"
         }]
       glyphicons:
         files: [{
           expand: true
-          cwd: "src/bower_components/bootstrap-sass/assets/fonts/"
+          cwd: "node_modules/bootstrap-sass/assets/fonts/"
           src: ["**"]
           dest: "src/fonts"
         }]
       animate:
         files: [{
           expand: true
-          cwd: "src/bower_components/animate-scss/src"
+          cwd: "node_modules/animate-scss/src"
           src: ["**"]
           dest: "src/_sass/vendor/animate"
         }]
       jquery:
         files: [{
           expand: true
-          cwd: "src/bower_components/jquery/dist/"
+          cwd: "node_modules/jquery/dist/"
           src: ["jquery.min.js", "jquery.min.map"]
           dest: "src/javascripts/vendor"
         }]
       miniParallax:
         files: [{
           expand: true
-          cwd: "src/bower_components/mini-parallax/"
+          cwd: "node_modules/mini-parallax/"
           src: ["jquery.mini.parallax.js"]
           dest: "src/javascripts/vendor"
         }]
       wow:
         files: [{
           expand: true
-          cwd: "src/bower_components/wowjs/dist"
+          cwd: "node_modules/wowjs/dist"
           src: ["wow.min.js"]
           dest: "src/javascripts/vendor"
         }]
 
     exec:
-      bower:
-        cmd: "bower install"
+      # https://jekyllrb.com/docs/installation/ubuntu/
+      gems:
+        cmd: "gem install jekyll:3.8.4 bundler:1.17.1"
       jekyll:
         cmd: "jekyll build --trace"
 
@@ -65,17 +73,9 @@ module.exports = (grunt) ->
         livereload: true
       source:
         files: [
-          "src/_drafts/**/*"
-          "src/_includes/**/*"
-          "src/_layouts/**/*"
-          "src/_posts/**/*"
-          "src/_sass/**/*"
-          "src/stylesheets/**/*"
-          "src/images/*"
-          "src/javascripts/**/*"
+          "node_modules"
+          "src/**/*"
           "_config.yml"
-          "src/**/*.html"
-          "src/**/*.md"
         ]
         tasks: [
           "exec:jekyll"
@@ -88,13 +88,20 @@ module.exports = (grunt) ->
           base: 'public'
           livereload: true
 
-  grunt.registerTask "build", [
-    "exec:bower"
+  #
+  # Custom Tasks
+  #
+
+  grunt.registerTask "install", "Install jekyll 3.8.4", [
+    "exec:gems"
+  ]
+
+  grunt.registerTask "build", "Generate static website to ./public directory", [
     "copy"
     "exec:jekyll"
   ]
 
-  grunt.registerTask "serve", [
+  grunt.registerTask "serve", "Run a development server on localhost:4000", [
     "build"
     "connect:server"
     "watch"
