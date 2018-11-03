@@ -21,42 +21,42 @@ module.exports = (grunt) ->
       bootstrap:
         files: [{
           expand: true
-          cwd: "bower_components/bootstrap-sass/assets/stylesheets/"
+          cwd: "node_modules/bootstrap-sass/assets/stylesheets/"
           src: ["**"]
           dest: "src/_sass/vendor"
         }]
       glyphicons:
         files: [{
           expand: true
-          cwd: "bower_components/bootstrap-sass/assets/fonts/"
+          cwd: "node_modules/bootstrap-sass/assets/fonts/"
           src: ["**"]
           dest: "src/fonts"
         }]
       animate:
         files: [{
           expand: true
-          cwd: "bower_components/animate-scss/src"
+          cwd: "node_modules/animate-scss/src"
           src: ["**"]
           dest: "src/_sass/vendor/animate"
         }]
       jquery:
         files: [{
           expand: true
-          cwd: "bower_components/jquery/dist/"
+          cwd: "node_modules/jquery/dist/"
           src: ["jquery.min.js", "jquery.min.map"]
           dest: "src/javascripts/vendor"
         }]
       miniParallax:
         files: [{
           expand: true
-          cwd: "bower_components/mini-parallax/"
+          cwd: "node_modules/mini-parallax/"
           src: ["jquery.mini.parallax.js"]
           dest: "src/javascripts/vendor"
         }]
       wow:
         files: [{
           expand: true
-          cwd: "bower_components/wowjs/dist"
+          cwd: "node_modules/wowjs/dist"
           src: ["wow.min.js"]
           dest: "src/javascripts/vendor"
         }]
@@ -65,8 +65,6 @@ module.exports = (grunt) ->
       # https://jekyllrb.com/docs/installation/ubuntu/
       gems:
         cmd: "gem install jekyll:3.8.4 bundler:1.17.1"
-      bower:
-        cmd: "bower install"
       jekyll:
         cmd: "jekyll build --trace"
 
@@ -75,7 +73,6 @@ module.exports = (grunt) ->
         livereload: true
       source:
         files: [
-          "bower_components"
           "node_modules"
           "src/**/*"
           "_config.yml"
@@ -100,7 +97,6 @@ module.exports = (grunt) ->
   ]
 
   grunt.registerTask "build", "Generate static website to ./public directory", [
-    "exec:bower"
     "copy"
     "exec:jekyll"
   ]
