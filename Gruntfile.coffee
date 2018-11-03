@@ -62,6 +62,9 @@ module.exports = (grunt) ->
         }]
 
     exec:
+      # https://jekyllrb.com/docs/installation/ubuntu/
+      gems:
+        cmd: "gem install jekyll:3.8.4 bundler:1.17.1"
       bower:
         cmd: "bower install"
       jekyll:
@@ -89,6 +92,10 @@ module.exports = (grunt) ->
           livereload: true
 
   grunt.registerTask "build", [
+  grunt.registerTask "install", "Install jekyll 3.8.4", [
+    "exec:gems"
+  ]
+
     "exec:bower"
     "copy"
     "exec:jekyll"
