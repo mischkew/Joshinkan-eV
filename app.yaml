@@ -1,0 +1,27 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+skip_files:
+- node_modules/
+- src/
+- .git/
+- .gitignore
+- _config.yml
+- .sass-cache/
+- package.json
+- package-lock.json
+- Gruntfile.coffee
+
+handlers:
+- url: /
+  static_files: public/verein/index.html
+  upload: public/verein/index.html
+
+- url: /(.*)/
+  static_files: public/\1/index.html
+  upload: public/(.*)/index.html
+
+- url: /(.*)
+  static_files: public/\1
+  upload: public/(.*)
