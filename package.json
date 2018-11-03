@@ -6,7 +6,9 @@
   "scripts": {
     "gems": "grunt gems",
     "build": "grunt build",
-    "start": "grunt serve"
+    "start": "grunt serve",
+    "deploy": "grunt deploy",
+    "browse": "grunt browse"
   },
   "author": "Sven Mischkewitz",
   "license": "MIT",
