@@ -91,17 +91,21 @@ module.exports = (grunt) ->
           base: 'public'
           livereload: true
 
-  grunt.registerTask "build", [
+  #
+  # Custom Tasks
+  #
+
   grunt.registerTask "install", "Install jekyll 3.8.4", [
     "exec:gems"
   ]
 
+  grunt.registerTask "build", "Generate static website to ./public directory", [
     "exec:bower"
     "copy"
     "exec:jekyll"
   ]
 
-  grunt.registerTask "serve", [
+  grunt.registerTask "serve", "Run a development server on localhost:4000", [
     "build"
     "connect:server"
     "watch"
