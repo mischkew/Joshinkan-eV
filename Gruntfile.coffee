@@ -70,7 +70,7 @@ module.exports = (grunt) ->
       deploy:
         cmd: "gcloud app deploy --quiet"
       browse:
-        cmd: "glcoud app browse"
+        cmd: "gcloud app browse"
 
     watch:
       options:
