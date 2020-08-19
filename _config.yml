@@ -17,5 +17,5 @@ markdown: kramdown
 
 # Plugins
 plugins:
-  #- jekyll-redirect-from
+  - jekyll-redirect-from
   - jekyll-email-protect
