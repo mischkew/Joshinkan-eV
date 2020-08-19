@@ -12,7 +12,10 @@ header {
   margin-bottom: 0;
   color: white;
 
-  a, a:hover, a:active, a:focus {
+  a,
+  a:hover,
+  a:active,
+  a:focus {
     color: white;
   }
 
@@ -32,14 +35,18 @@ header {
     padding-top: 20px;
   }
 
-  .page-links, .contact {
+  .page-links,
+  .contact {
   }
 
-  .page-link-wrapper, .contact-text {
+  .page-link-wrapper,
+  .contact-text {
     margin: 24px 0;
   }
 
-  .page-link, .contact-text, .site-title {
+  .page-link,
+  .contact-text,
+  .site-title {
     text-decoration: none;
     padding: 4px 24px;
 
@@ -49,6 +56,10 @@ header {
 
   .page-link {
     font-size: 48px;
+  }
+
+  .page-link.corona {
+    color: $orange;
   }
 
   .contact {
