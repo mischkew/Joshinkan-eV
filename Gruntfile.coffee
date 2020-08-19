@@ -64,7 +64,7 @@ module.exports = (grunt) ->
     exec:
       # https://jekyllrb.com/docs/installation/ubuntu/
       gems:
-        cmd: "gem install jekyll:3.8.4 bundler:1.17.1"
+        cmd: "gem install jekyll:3.8.4 bundler:1.17.1 jekyll-redirect-from:0.16.0"
       jekyll:
         cmd: "jekyll build --trace"
       deploy:

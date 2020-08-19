@@ -4,7 +4,7 @@
   "description": "joshinkan.de website",
   "main": "index.js",
   "scripts": {
-    "gems": "grunt gems",
+    "install": "grunt install",
     "build": "grunt build",
     "start": "grunt serve",
     "deploy": "grunt deploy",
