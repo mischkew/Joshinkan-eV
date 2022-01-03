@@ -2,6 +2,7 @@
 
 ## Requirements
 
+- Ruby < 3
 - [gem > v2.7.6](https://rubygems.org/)
 - NodeJs and npm
 - [GCloud SDK](https://cloud.google.com/sdk/install) for deployment
@@ -9,6 +10,7 @@
 ## Installation
 
 ``` bash
+# Make sure to use Ruby 2.7 (not default on OSX) - i.e. link the brew formula explicitly
 # Install development and frontend dependencies
 npm install
 
@@ -17,6 +19,8 @@ npm run gems
 ```
 
 ## Usage
+
+Make sure to use Ruby 2.7 first.
 
 Run the development server via `npm start`. Checkout http://localhost:4000.
 
