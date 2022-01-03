@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "animate-scss": "https://github.com/benhodgson87/animate.scss/archive/1.2.2.tar.gz",
-    "bootstrap-sass": "~3.3.4",
+    "bootstrap-sass": "~3.4.1",
     "mini-parallax": "https://github.com/mischkew/jQuery-mini-parallax/archive/v1.0.1.tar.gz",
     "wowjs": "~1.1.3"
   }
