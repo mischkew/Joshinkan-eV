@@ -1,10 +1,3 @@
----
-layout: default
-title: Kontakt
-permalink: /kontakt/
-order: 10
----
-
 <h1 id="kontakt" class="page-title red">Kontakt</h1>
 
 <div class="card-wrapper large center contact-map">
@@ -15,30 +8,35 @@ order: 10
   </div>
   <div class="card-body">
     <div class="col-sm-12">
-      <div class="card-text-header text-center">{{ site.title }}</div>
+      <div class="card-text-header text-center">{{ variable.sh title }}</div>
       <div class="card-text-small text-center">
-        {% markdown %}
-Spothalle OSZ Werder \\
-Altenkirchweg 6-8 \\
-14542 Werder \\
-\\
-Sven Mischkewitz \\
-{{ site.data.contact.email_text }} \\
-+49 175 472 48 48
-        {% endmarkdown %}
+        <p>
+          Spothalle OSZ Werder<br/>
+          Altenkirchweg 6-8<br/>
+          14542 Werder<br/>
+          <br/>
+          Sven Mischkewitz<br/>
+          {{ variable.sh email_text }}<br/>
+          {{ variable.sh phone }}
+        </p>
       </div>
     </div>
     <div class="col-sm-12">
       <div class="card-text-small">
-      <p class="empty-block"></p>
-        {% markdown %}
-Melde dich einfach per Mail oder telefonisch und komme zum Probetraining
-vorbei. Bitte melde dich vorher digital zum Probetraining an.
-
-[Anmeldung zum Probetraining](https://joshinkan-werder.kurabu.com/de/join/step-1) \\
-[Mitgliederantrag](https://joshinkan-werder.kurabu.com/de/join/step-1) \\
-[Flyer](/assets/flyer.pdf)
-        {% endmarkdown %}
+        <p class="empty-block"></p>
+        <p>
+          Melde dich einfach per Mail oder telefonisch und komme zum
+          Probetraining vorbei. Bitte melde dich vorher digital zum
+          Probetraining an.<br/>
+        </p>
+        <p>
+          <a href="https://joshinkan-werder.kurabu.com/de/join/step-1">
+            Anmeldung zum Probetraining
+          </a>
+          <br/>
+          <a href="https://joshinkan-werder.kurabu.com/de/join/step-1">
+            Mitgliederantrag
+          <a/>
       </div>
     </div>
   </div> <!-- end card body -->
