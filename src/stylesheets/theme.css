@@ -92,9 +92,6 @@ body {
   color: var(--color-foreground);
 }
 body > main {
-  padding: 3rem 0.6rem 0;
-  overflow-x: hidden;
-  max-width: var(--width);
   min-width: 360px;
   margin: 0 auto;
 }
@@ -141,8 +138,7 @@ dt {
 h1,
 h2,
 h3 {
-  margin: 1.5em 0 0.5rem;
-  font: var(--font-h);
+  margin: 1.5rem 0 0.5rem;
   line-height: 1.2em;
   clear: both;
 }
@@ -154,13 +150,14 @@ h4 + h5 {
   padding-top: 0;
 } /* non-clashing headings */
 h1 {
-  font-size: 2.2em;
+  font-size: 6em;
   font-weight: 300;
+  text-align: center;
+  margin: 5rem;
 }
 h2 {
   font-size: 2em;
   font-weight: 300;
-  font-variant: small-caps;
 }
 h3 {
   font-size: 1.5em;
@@ -232,6 +229,10 @@ html {
 .cyan { color: var(--color-cyan); }
 .red { color: var(--color-red); }
 
+.orange-background { background-color: var(--color-orange); }
+.cyan-background { background-color: var(--color-cyan); }
+.red-background { background-color: var(--color-red); }
+
 /* Icons */
 
 .icon {
@@ -254,6 +255,104 @@ html {
   background-image: url(../images/icon_phone.png);
 }
 
+/* Text Content */
+
+main article {
+  max-width: 600px;
+  padding: 0 1rem;
+  background-color: rgba(251,251,251,0.8);
+  backdrop-filter: blur(4px);
+  text-align: justify;
+}
+
+
+/* Cards */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  align-items: center;
+  box-shadow: 4px 4px 24px 0px rgba(0,0,0,0.05);
+}
+
+.card label {
+  position: relative;
+  height: 2rem;
+  margin-top: -1rem;
+}
+
+.card label .badge {
+  display: block;
+  position: absolute;
+  z-index: 100;
+  left: -0.8rem;
+
+  height: 2rem;
+  width: 2rem;
+  padding: 0.2rem;
+
+  border: 1px solid;
+  border-radius: 3rem;
+
+  line-height: 1.4;
+  text-align: center;
+
+  background-color: var(--color-background);
+}
+
+.card label .badge.orange {
+  border-color: var(--color-orange);
+}
+
+.card label .badge.cyan {
+  border-color: var(--color-cyan);
+}
+
+.card label .subtext {
+  line-height: 1.5;
+  padding: 0.2rem 0.8rem 0.2rem 1.6rem;
+  height: 2rem;
+  display: block;
+  border-radius: 0 3rem 3rem 0;
+  color: var(--color-contrast);
+}
+
+.card h3 {
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.card p {
+  text-align: center;
+  font-size: 0.9em;
+  margin: 1.4rem 0;
+}
+
+/* Verein */
+
+#trainingszeiten {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-evenly;
+  margin-bottom: 4rem;
+  padding: 0 1rem;
+}
+
+#verein-wrapper {
+  width: 100%;
+  min-height: 1000px;
+  background-image: url(../images/background_verein_large.png);
+  background-position: top center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 440px 1rem 3rem 1rem;
+}
 
 /* Header Menu */
 
@@ -324,14 +423,6 @@ footer img {
   width: 16rem;
   margin-top: -8rem;
 }
-
-
-/* @media screen and (max-width: 68rem) { */
-/*   footer { */
-/*     background-size: 192px auto; /\* 75% of the image height *\/ */
-/*   } */
-/* } */
-
 
 footer > section {
   display: flex;;

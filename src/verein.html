@@ -5,81 +5,114 @@
   </head>
   <body>
     {{ include.sh templates/header.html }}
+
     <main>
       <h1 class="orange">Verein</h1>
 
-      <div class="container-fluid">
+      <!-- trainingszeiten -->
+      <div id="trainingszeiten" class="clearfix col-xs-20 col-xs-offset-2">
 
-        <!-- trainingszeiten -->
-        <div id="trainingszeiten" class="clearfix col-xs-20 col-xs-offset-2">
-
-          <!-- kindertraining -->
-          <div class="card-wrapper offset-left">
-            <div class="card-image-wrapper card-image-gradient">
-              <img src="/images/training_kinder.png">
-            </div>
-            <div class="card-label-wrapper">
-              <div class="card-label-circle cyan">Do</div>
-              <div class="card-label cyan-background">17:00 - 18:30</div>
-            </div>
-            <div class="card-body">
-              <div class="card-text-header text-center">Kindertraining</div>
-              <div class="card-text-xs text-center">
-                Anfänger und Fortgeschrittene
-                <br/>
-                ab 8 Jahre
-                <br/>
-                <a href="/kontakt/#kontakt">Zum Probetraining anmelden</a>
-              </div>
-              <div class="card-text-small text-center">15 € monatlich | 150 € jährlich</div>
-            </div>
-          </div> <!-- end kindertraining -->
-
-          <!-- erwachsenen training -->
-          <div class="card-wrapper offset-left-small">
-            <div class="card-image-wrapper card-image-gradient">
-              <img src="/images/training_erwachsene.png">
-            </div>
-            <div class="card-label-wrapper">
-              <div class="card-label-circle orange">Do</div>
-              <div class="card-label orange-background">18:30 - 20:00</div>
-            </div>
-            <div class="card-body">
-              <div class="card-text-header text-center">Erwachsenentraining</div>
-              <div class="card-text-xs text-center">
-                Anfänger und Fortgeschrittene
-                <br/>
-                <a href="/kontakt/#kontakt">Zum Probetraining anmelden</a>
-              </div>
-              <div class="card-text-small text-center">20 € monatlich | 200 € jährlich</div>
-            </div>
-          </div> <!-- end erwachsenen training -->
-
-        </div> <!-- end trainingszeiten -->
-
-      </div> <!-- end .container-fluid -->
-
-      <div class="verein-wrapper">
-        <!-- verein und trainer -->
-        <div class="container">
-          <div class="opaque-text-block text-block-col">
-            <h3>Verein und Trainer</h3>
+        <!-- kindertraining -->
+        <div class="card">
+          <img src="/images/training_kinder.png">
+          <label>
+            <span class="badge cyan">Do</span>
+            <span class="subtext cyan-background">17:00 - 18:30</span>
+          </label>
+          <div class="card-body">
+            <h3>Kindertraining</h3>
             <p>
-              Der Joshinkan Werder e.V. hat sich 2010 geründet. Nach mehr als 20 Jahren Gojuryu-Karate, dem wir uns nach wie vor verbunden sehen, bot Joshinkan mit den integrierten Komponenten des Karate, Kobudo und Bodenkampf eine besondere Perspektive, die unserem Anspruch an Erforschung und Vermittlung traditioneller Kampfkunst entspricht und im Sportkarate in der Form nicht zu finden war.
+              Anfänger und Fortgeschrittene
+              <br/>
+              ab 8 Jahre
+              <br/>
+              <a href="/kontakt/#kontakt">Zum Probetraining anmelden</a>
             </p>
-            <p>
-              Initiiert durch das dänische Honbu-Dojo und Sensei Lars Andersen bietet das Isshinryu-Karate im Joshinkan-System eine breite Vielfalt von Anwendungen, die sich dann nicht nur den besonders athletischen Mitstreitern erschließen sondern allen Schülern gleichermaßen die Möglichkeit gibt, sich Talente mit einzelnen Kobudowaffen, im Bodenkampf oder der Selbstverteidigung, unabhängig vom Alter und der Konstitution zu erarbeiten. Natürlich ist der Name des Stiles, - *„die Schule mit dem herausragenden Geist“* - maßgebend in Bezug auf die inneren Werte des Karate, wie Respekt, Ausdauer, Anstrengung, mentale Einstellung und nicht zuletzt soziale Reife.
-            </p>
-            <p>
-              Isshinryu-Karate richtet sich aufgrund der physischen, koordinativen und technischen Anforderungen eher an Erwachsene, die bereits Karate trainieren. Um es auch Anfängern, Kindern (ab 8 Jahren) und Jugendlichen zugänglich zu machen, haben wir im Joshinkan ein geeignetes Trainings- und Prüfungsprogramm entwickelt. Dabei wurden Anfängerformen implementiert und teilweise auch aus dem Gojuryu-Karate entlehnt.
-            </p>
-            <p>
-              Die Trainer im Verein sind besonders im Umgang mit Kindern und Jugendlichen qualifiziert und durch den Berliner Karateverband lizensiert. Empathie und Engagement sind wichtige Faktoren, die unsere Trainer mitbringen, neben langer Erfahrung in der Kampfkunst. Wir arbeiten ebenfalls mit Sozialbehörden zusammen, um z.B. auch Kindern das Training und Seminare zu ermöglichen, wo die Eltern nicht über ausreichend finanzielle Mittel verfügen. Der Verein finanziert sich selbst aus Mitgliedsbeiträgen und trägt Kosten für Hallenmiete und Aufwandsentschädigungen. Alle Trainer engagieren sich ehrenamtlich.
-            </p>
+            <p>15 € monatlich | 150 € jährlich</p>
           </div>
-        </div> <!-- end verein und trainer -->
+        </div>
+        <!-- end kindertraining -->
+
+        <!-- erwachsenen training -->
+        <div class="card">
+          <img src="/images/training_erwachsene.png">
+          <label>
+            <span class="badge orange">Do</span>
+            <span class="subtext orange-background">18:30 - 20:00</span>
+          </label>
+          <div class="card-body">
+            <h3>Erwachsenentraining</h3>
+            <p>
+              Anfänger und Fortgeschrittene
+              <br/>
+              ab 16 Jahre
+              <br/>
+              <a href="/kontakt/#kontakt">Zum Probetraining anmelden</a>
+            </p>
+            <p>20 € monatlich | 200 € jährlich</p>
+          </div>
+        </div>
+        <!-- end erwachsenentraining -->
+
       </div>
+      <!-- end trainingszeiten -->
+
+      <!-- verein wrapper -->
+      <div id="verein-wrapper">
+
+        <!-- verein und trainer -->
+        <article>
+            <h2>Verein</h2>
+            <p>
+              Der Joshinkan Werder e.V. hat sich 2010 geründet. Nach mehr als 20
+              Jahren Gojuryu-Karate, dem wir uns nach wie vor verbunden sehen,
+              bot Joshinkan mit den integrierten Komponenten des Karate, Kobudo
+              und Bodenkampf eine besondere Perspektive, die unserem Anspruch an
+              Erforschung und Vermittlung traditioneller Kampfkunst entspricht
+              und im Sportkarate in der Form nicht zu finden war.
+            </p>
+            <p>
+              Initiiert durch das dänische Honbu-Dojo und Sensei Lars Andersen
+              bietet das Isshinryu-Karate im Joshinkan-System eine breite
+              Vielfalt von Anwendungen, die sich dann nicht nur den besonders
+              athletischen Mitstreitern erschließen sondern allen Schülern
+              gleichermaßen die Möglichkeit gibt, sich Talente mit einzelnen
+              Kobudowaffen, im Bodenkampf oder der Selbstverteidigung,
+              unabhängig vom Alter und der Konstitution zu erarbeiten. Natürlich
+              ist der Name des Stiles, - *„die Schule mit dem herausragenden
+              Geist“* - maßgebend in Bezug auf die inneren Werte des Karate, wie
+              Respekt, Ausdauer, Anstrengung, mentale Einstellung und nicht
+              zuletzt soziale Reife.
+            </p>
+            <p>
+              Isshinryu-Karate richtet sich aufgrund der physischen,
+              koordinativen und technischen Anforderungen eher an Erwachsene,
+              die bereits Karate trainieren. Um es auch Anfängern, Kindern (ab 8
+              Jahren) und Jugendlichen zugänglich zu machen, haben wir im
+              Joshinkan ein geeignetes Trainings- und Prüfungsprogramm
+              entwickelt. Dabei wurden Anfängerformen implementiert und
+              teilweise auch aus dem Gojuryu-Karate entlehnt.
+            </p>
+            <h2>Trainer</h2>
+            <p>
+              Die Trainer im Verein sind besonders im Umgang mit Kindern und
+              Jugendlichen qualifiziert und durch den Berliner Karateverband
+              lizensiert. Empathie und Engagement sind wichtige Faktoren, die
+              unsere Trainer mitbringen, neben langer Erfahrung in der
+              Kampfkunst. Wir arbeiten ebenfalls mit Sozialbehörden zusammen, um
+              z.B. auch Kindern das Training und Seminare zu ermöglichen, wo die
+              Eltern nicht über ausreichend finanzielle Mittel verfügen. Der
+              Verein finanziert sich selbst aus Mitgliedsbeiträgen und trägt
+              Kosten für Hallenmiete und Aufwandsentschädigungen. Alle Trainer
+              engagieren sich ehrenamtlich.
+            </p>
+        </article>
+        <!-- end verein und trainer -->
+
+      </div>
+      <!-- end verein wrapper -->
     </main>
+
     {{ include.sh templates/footer.html }}
   </body>
 </html>
