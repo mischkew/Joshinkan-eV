@@ -153,7 +153,7 @@ h1 {
   font-size: 6em;
   font-weight: 300;
   text-align: center;
-  margin: 5rem;
+  margin: 5rem 0;
 }
 h2 {
   font-size: 2em;
@@ -259,10 +259,14 @@ html {
 
 main article {
   max-width: 600px;
-  padding: 0 1rem;
+  padding: 0 1rem 3rem 1rem;
   background-color: rgba(251,251,251,0.8);
   backdrop-filter: blur(4px);
   text-align: justify;
+}
+
+main article h2 {
+  text-align: left;
 }
 
 
@@ -351,7 +355,21 @@ main article {
   display: flex;
   justify-content: center;
 
-  padding: 440px 1rem 3rem 1rem;
+  padding: 440px 1rem 0 1rem;
+}
+
+/* Kontakt */
+
+#kontakt {
+  max-width: 600px;
+  padding: 0 1rem;
+  margin: 0 auto;
+}
+
+#anmeldung {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
 }
 
 /* Header Menu */
