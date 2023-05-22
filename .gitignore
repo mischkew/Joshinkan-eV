@@ -1,5 +1,7 @@
 .sass-cache
 public
+build
+logs
 node_modules
 bower_components
 src/javascripts/vendor

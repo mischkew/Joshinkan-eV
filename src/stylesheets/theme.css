@@ -5,6 +5,8 @@
  4. Application Styles
 */
 
+@import "/stylesheets/glyphicons.css";
+
 /* -- 1. Theme Settigns -- */
 :root {
   --rem: 16px;
@@ -25,14 +27,14 @@
   --color-foreground: #433;
   --color-background: #fbfbfb;
   --color-dark: #888;
-  --color-light: #f5f6f7;
-  --color-medium: #d1d1d1;
+  --color-light: #ddd;
+  --color-medium: #9B9B9B;
   --color-link: #07c;
   --color-emphasis: var(--color-orange);
   --color-emphasis-background: #0881;
 
   --color-contrast: #fbfbfb;
-  --color-background-contrast: rgba(0,0,0,0.6);
+  --color-background-contrast: rgba(0,0,0,0.5);
 
 }
 
@@ -223,6 +225,30 @@ html {
   min-width: 360px;
 }
 
+/* Quotes */
+
+blockquote {
+  color: var(--color-medium);
+  font-size: 1rem;
+  border-left: 1px solid var(--color-light);
+  padding: 0.8rem 1.2rem;
+  margin: 0 1.2rem;
+}
+
+blockquote q {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+blockquote q::before {
+  content: '\2014 \00A0';
+}
+
+blockquote q::after {
+  content: '';
+}
+
+
 /* Color Classes */
 
 .orange { color: var(--color-orange); }
@@ -255,18 +281,78 @@ html {
   background-image: url(../images/icon_phone.png);
 }
 
+
 /* Text Content */
 
+main > section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 main article {
-  max-width: 600px;
-  padding: 0 1rem 3rem 1rem;
+  max-width: calc(600px + 3rem);
+  padding: 3rem;
   background-color: rgba(251,251,251,0.8);
   backdrop-filter: blur(4px);
   text-align: justify;
+
+  display: flex;
+  flex-direction: column;
+}
+
+main article > img,
+main article > .image-with-label {
+  align-self: center;
 }
 
 main article h2 {
-  text-align: left;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+main article h2:first-child {
+  margin-top: 0;
+}
+
+main article p:last-child {
+  margin-bottom: 0;
+}
+
+main article p + h2 {
+  margin-top: 3rem;
+}
+
+main article hr {
+  position: relative;
+  width: 90%;
+  height: 32px;
+  margin: 1.5rem 0;
+  background-image: url(/images/separator.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  border: 0;
+}
+
+main article hr::before,
+main article hr::after {
+  content: "";
+  display: block;
+
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 0;
+
+  border-top: 1px solid var(--color-medium);
+}
+
+main article hr::before {
+  left: 60%;
+}
+
+main article hr::after {
+  right: 60%;
 }
 
 
@@ -334,6 +420,50 @@ main article h2 {
   margin: 1.4rem 0;
 }
 
+/* Image with a Label Overlay */
+/* Usage: <div class="image-with-label"><img><label>Label Text</label></div> */
+
+.image-with-label,
+article > img {
+  display: inline-block;
+  position: relative;
+  max-height: 40rem;
+  margin: 2rem;
+}
+
+.image-with-label img {
+  max-height: 40rem;
+}
+
+.image-with-label label {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  padding: 0.5rem;
+  color: var(--color-contrast);
+  background-color: var(--color-background-contrast);
+}
+
+/* Parallax Banner */
+/* Usage:
+     <div class="banner parallex my-class"></div>
+
+   Assign a custom background image to my-class.
+*/
+.banner {
+  width: 100%;
+  height: 748px;
+  overflow: hidden;
+}
+
+.banner.parallax {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
 /* Verein */
 
 #trainingszeiten {
@@ -356,6 +486,218 @@ main article h2 {
   justify-content: center;
 
   padding: 440px 1rem 0 1rem;
+}
+
+/* Training */
+
+#training-overview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-emphasis-background);
+  padding: 6rem 0 2rem 0;
+}
+
+h1.training {
+  margin-bottom: 0;
+}
+
+.scroll-top {
+  position: fixed;
+  z-index: 999;
+  top: 5%;
+  left: 5%;
+  width: 50px;
+  height: 50px;
+  display: none;
+}
+
+.scroll-top span {
+  transition: opacity 0.1s ease-in;
+    background-color: var(--color-background-contrast);
+    opacity: 0.3;
+    padding: 5px;
+    color: white;
+    font-size: 40px;
+    border-radius: 8px;
+}
+
+blockquote.training {
+  max-width: 18rem;
+  margin: 2rem auto 5rem auto;
+}
+
+#training-overview .training-aspects {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  max-width: calc(2 * 256px + 2rem);
+}
+
+#training-overview .training-aspect {
+  position: relative;
+  display: block;
+  width: 256px;
+  height: 256px;
+  box-shadow: 0 2px 3px var(--color-background-contrast);
+}
+
+#training-overview .training-aspect label {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 1rem;
+  padding: 0.5rem;
+  color: var(--color-contrast);
+  background-color: var(--color-background-contrast);
+  cursor: pointer;
+  width: calc(90% - 0.5rem);
+}
+
+#training-overview .training-aspect label h3 {
+  font-weight: 100;
+  margin: 0.5rem 0;
+}
+
+#training-overview .training-aspect label span {
+  font-weight: 200;
+}
+
+#training-overview .training-aspect .scroll-down {
+  position: absolute;
+  width: 100%;
+  height: 3rem;
+  background-color: var(--color-background-contrast);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-contrast);
+  font-size: 2.4rem;
+  visibility: hidden;
+}
+
+#training-overview .training-aspect:hover .scroll-down {
+  visibility: visible;
+}
+
+
+#training-overview .training-aspect.kata::before {
+  top: -77px;
+  left: -58px;
+  background-image: url(/images/spots.png);
+  display: block;
+  content: "";
+  width: 164px;
+  height: 192px;
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@media screen and (min-width: 64rem) {
+  #training-overview .training-aspects {
+    margin-left: calc(-425px / 2);
+  }
+
+  #training-overview .kobudo::after {
+    display: block;
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url(/images/karateka.png);
+    width: 425px;
+    height: 524px;
+    top: calc(2rem + 3px);
+    left: 100%;
+  }
+
+  #training-overview .kobudo:hover::after {
+    filter: brightness(0.90);
+  }
+}
+
+#kata-und-bunkai {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.banner-kobudo {
+  background-image: url(/images/kobudo_banner.jpg);
+}
+
+#kobudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 160px;
+  background-image: url(/images/sai_banner.jpg);
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+#kobudo article {
+  background-color: var(--color-background);
+}
+
+#kobudo article:first-child {
+  box-shadow: 0 2px 3px var(--color-background-contrast);
+}
+
+#kobudo .weapon-collection {
+  max-width: calc(672px + 3rem);
+  margin: -3rem 0;
+}
+
+#ne-waza {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 3rem 0;
+}
+
+#ne-waza .images-stacked {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6rem;
+  max-height: 512px;
+}
+@media screen and (max-width: 48rem) {
+  #ne-waza .images-stacked {
+    display: none;
+  }
+}
+
+#ne-waza .images-stacked img {
+  position: relative;
+  float: left;
+  width: 25%;
+  min-height: 1px;
+  box-shadow: 0 2px 3px var(--color-background-contrast);
+}
+
+#ne-waza .images-stacked img:first-child {
+  transform: translate(17.19%, 15.6%);
+}
+
+#ne-waza .images-stacked img:last-child {
+  transform: translate(-17.19%, 15.6%);
+  z-index: -1;
+}
+
+#ne-waza .images-straight {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#ne-waza .images-straight img {
+  max-height: 256px;
 }
 
 /* Kontakt */
