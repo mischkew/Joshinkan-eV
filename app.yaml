@@ -9,12 +9,19 @@ skip_files:
 - .gitignore
 
 handlers:
+
+- url: /(.*\.(png|jpg|css|js|html))$
+  secure: always
+  static_files: build/\1
+  upload: build/(.*)
+
 - url: /
   secure: always
   static_files: build/verein.html
   upload: build/verein.html
 
-- url: /(.*)
+# Match /<name> urls to top-level html files
+- url: /(.*)$
   secure: always
-  static_files: build/\1
-  upload: build/(.*)
+  static_files: build/\1.html
+  upload: build/.*\.html
