@@ -3,25 +3,18 @@ api_version: 1
 threadsafe: true
 
 skip_files:
-- node_modules/
 - src/
+- logs/
 - .git/
 - .gitignore
-- _config.yml
-- .sass-cache/
-- package.json
-- package-lock.json
-- Gruntfile.coffee
 
 handlers:
 - url: /
-  static_files: public/verein/index.html
-  upload: public/verein/index.html
-
-- url: /(.*)/
-  static_files: public/\1/index.html
-  upload: public/(.*)/index.html
+  secure: always
+  static_files: build/verein.html
+  upload: build/verein.html
 
 - url: /(.*)
-  static_files: public/\1
-  upload: public/(.*)
+  secure: always
+  static_files: build/\1
+  upload: build/(.*)

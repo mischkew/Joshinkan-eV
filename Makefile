@@ -28,24 +28,12 @@ clean:
 watch:
 	while true; do $(MAKE) --silent; sleep 1; done
 
-# TODO: also build templates recursively!
+
 build/%.html: src/%.html $(wildcard src/templates/*.html) | sed
 	@echo "Building $< to $@"
 	@mkdir -p $$(dirname $@)
 	./src/scripts/include.sh $< > $@ || (rm $@ && exit 1)
 
-
-# @cd src/ && \
-# 	$(SED) -Ee 's:\{\{([^\{\}]*)\}\}:\n&\n:g' ../$< \
-# 		| $(SED) -Ee 's:\{\{([^\{\}]*)\}\}:\1:e' > ../$@ \
-# 			2>/tmp/build-err.log
-# @if [ -s /tmp/build-err.log ]; then \
-# 	echo "Build errors for $<:"; \
-# 	rm $@; \
-# 	cat /tmp/build-err.log; \
-# 	rm /tmp/build-err.log; \
-#  	exit 1; \
-# fi
 
 start: build
 	mkdir -p logs
@@ -62,3 +50,6 @@ logs-error:
 
 logs-access:
 	tail -f logs/access.log
+
+deploy:
+	gcloud app deploy --quiet

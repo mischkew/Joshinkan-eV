@@ -1,39 +1,47 @@
 # Joshinkan e.V.
 
-## Requirements
 
-- Ruby < 3
-- [gem > v2.7.6](https://rubygems.org/)
-- NodeJs and npm
-- [GCloud SDK](https://cloud.google.com/sdk/install) for deployment
+## Development
 
-## Installation
+**Requirements**
+- nginx
+- make
+- sed
+- realpath
+- gcloud (Google Cloud Platform client, for dpeloyment)
+
+**Usage**
 
 ``` bash
-# Make sure to use Ruby 2.7 (not default on OSX) - i.e. link the brew formula explicitly
-# Install development and frontend dependencies
-npm install
+# Start the nginx server for local development
+make start
 
-# Install jekyll for static site generation
-npm run gems
+# Then watch for changes as you are devving
+make watch
 ```
 
-## Usage
 
-Make sure to use Ruby 2.7 first.
+The website files are in src. Html files may contain `{{ CMD }}` templates. `CMD` can be an arbitrary shell command. The output of the shell command (`stdout`) is placed instead of the template. The `./src/scripts` folder is available in the `$PATH`. 
 
-Run the development server via `npm start`. Checkout http://localhost:4000.
+Templates included via the `include.sh` script are resolved recursively. 
 
-Or only build the static site via `npm run build`. The site will be generated into
-the `./public` directory.
+Variables can be defined in the `src/variables.ini` file. They can be read in an html file or template via `variable.sh`.
 
-Run `npm run deploy` to upload the static site to Google App Engine.
+nginx is only required during development. Deployment is handled via Google Cloud Platform.
 
-## Deployment Configuration
+## Deployment 
+
+```bash
+make deploy
+``` 
+
+**First Time Configuration**
 
 The website is hosted with Google Cloud Platform on Google App Engine. For
 first-time deployment follow these steps:
 - Login via `gcloud init`
 - Select a Google Project
-- `npm run deploy`
+- `make deploy`
 - Manage domain mapping via 1blu.de, e.g. *-appspot.com -> joshinkan.de
+
+
