@@ -700,6 +700,12 @@ blockquote.training {
   max-height: 256px;
 }
 
+#joshinkan {
+  background-image: url(../images/pots-left.png),url(../images/pots-right.png);
+  background-repeat: no-repeat, no-repeat;
+  background-size: 40% auto, 40% auto;
+  background-position: bottom left, top right;
+}
 /* Kontakt */
 
 #kontakt {
