@@ -1,0 +1,64 @@
+<footer>
+  <img src="/images/joshinkan_logo.png" />
+
+  <section class="site-structure">
+
+    <nav>
+      <a href="/verein" class="page-title">Verein</a>
+      <hr class="page-link-separator" />
+      <a href="/verein#trainingszeiten" class="page-link">Trainingszeiten</a>
+      <a href="/verein#vereinsgeschichte" class="page-link">Vereinsgeschichte</a>
+      <a href="/verein#trainer" class="page-link">Trainer</a>
+    </nav>
+
+    <nav>
+      <a href="/training" class="page-title">Training</a>
+      <hr class="page-link-separator" />
+      <a href="/training#kata-und-bunkai" class="page-link">Kata und Bunkai</a>
+      <a href="/training#kobudo" class="page-link">Kobudo</a>
+      <a href="/training#ne-waza" class="page-link">Ne-Waza</a>
+      <a href="/training#joshinkan" class="page-link">Joshinkan</a>
+    </nav>
+
+    <nav>
+      <a href="/kontakt" class="page-title">Kontakt</a>
+      <hr class="page-link-separator" />
+      <a href="/kontakt#kontakt" class="page-link">Anfahrt</a>
+      <a href="/kontakt#anmeldung">Probetraining</a>
+    </nav>
+
+    <nav>
+      <span class="page-title">Links</span>
+      <hr class="page-link-separator" />
+      <a href="http://www.isshinryu.dk" class="page-link">Isshinryu</a>
+      <a href="http://www.tokushinryu.eu" class="page-link">Tokushinryu</a>
+      <a href="http://www.seibukan.bplaced.net" class="page-link">Seibukan e.V.</a>
+      <a href="http://www.karateclubzen.de" class="page-link">Karate Club Zen</a>
+    </nav>
+
+  </section>
+
+  <section class="contact-links">
+    <div class="contact">
+      <span class="icon facebook"></span>
+      <a href="http://facebook.com{{ variable.sh facebook }}" target="_blank">{{ variable.sh facebook }}</a>
+    </div>
+    <div class="contact">
+      <span class="icon email"></span>
+      <a href="mailto:{{ variable.sh email }}">{{ variable.sh email_text }}</a>
+    </div>
+    <div class="contact">
+      <span class="icon phone"></span>
+      <a href="tel:{{variable.sh phone | sed 's/ //g'}}">{{ variable.sh phone }}</a>
+    </div>
+  </section> <!-- end row -->
+
+  <section class="bottom-links">
+    <span class="copyright">&copy; {{ variable.sh author }} 2010 - {{ date '+%Y' }}</span>
+    <span class="impress">
+      <a href="/impressum">Impressum</a>
+      <a href="/datenschutz">Datenschutz</a>
+    </span>
+  </section>
+
+</footer>

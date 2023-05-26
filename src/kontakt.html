@@ -1,45 +1,108 @@
----
-layout: default
-title: Kontakt
-permalink: /kontakt/
-order: 10
----
+<html>
+  <head>
+    <title>Kontakt</title>
+    {{ cat templates/metadata.html }}
+  </head>
+  <body>
+    {{ include.sh templates/header.html }}
 
-<h1 id="kontakt" class="page-title red">Kontakt</h1>
+    <main>
 
-<div class="card-wrapper large center contact-map">
-  <div class="card-image-wrapper card-image-gradient">
-    <!-- http://maps.googleapis.com/maps/api/staticmap?center=52.3788451,12.9229166&zoom=15&size=512x256&markers=color:red%7Clabel:Turnhalle%20OSZ%7C52.380635,%2012.928165&scale=2 -->
-    <img src="/images/staticmap.png" alt="" />
-    <span>
-  </div>
-  <div class="card-body">
-    <div class="col-sm-12">
-      <div class="card-text-header text-center">{{ site.title }}</div>
-      <div class="card-text-small text-center">
-        {% markdown %}
-Spothalle OSZ Werder \\
-Altenkirchweg 6-8 \\
-14542 Werder \\
-\\
-Sven Mischkewitz \\
-{{ site.data.contact.email_text }} \\
-+49 175 472 48 48
-        {% endmarkdown %}
-      </div>
-    </div>
-    <div class="col-sm-12">
-      <div class="card-text-small">
-      <p class="empty-block"></p>
-        {% markdown %}
-Melde dich einfach per Mail oder telefonisch und komme zum Probetraining
-vorbei. Bitte melde dich vorher digital zum Probetraining an.
+      <a
+        class="scroll-top"
+        href="#header"
+        data-scroll="true"
+        data-scroll-time="1000"
+        data-show-after="#anmeldung">
+        <span class="glyphicon glyphicon-circle-arrow-up"></span>
+      </a>
 
-[Anmeldung zum Probetraining](https://joshinkan-werder.kurabu.com/de/join/step-1) \\
-[Mitgliederantrag](https://joshinkan-werder.kurabu.com/de/join/step-1) \\
-[Flyer](/assets/flyer.pdf)
-        {% endmarkdown %}
-      </div>
-    </div>
-  </div> <!-- end card body -->
-</div>
+      <h1 class="red">Kontakt</h1>
+
+      <!-- kontakt -->
+      <section id="kontakt">
+
+        <!-- kontakt card -->
+        <div class="card">
+          <!-- http://maps.googleapis.com/maps/api/staticmap?center=52.3788451,12.9229166&zoom=15&size=512x256&markers=color:red%7Clabel:Turnhalle%20OSZ%7C52.380635,%2012.928165&scale=2 -->
+          <img src="/images/staticmap.png" alt="Anfahrt" />
+          <h3>{{ variable.sh title }}</h3>
+          <p>
+            <a href="https://goo.gl/maps/CWERdAL4wBHW4xrFA" target="_blank">
+            Spothalle OSZ Werder<br/>
+            Altenkirchweg 6-8<br/>
+            14542 Werder
+            </a>
+            <br/>
+            <br/>
+            Sven Mischkewitz<br/>
+            <a href="mailto:{{ variable.sh email }}">{{ variable.sh email_text }}</a><br/>
+            <a href="tel:{{variable.sh phone | sed 's/ //g'}}">{{ variable.sh phone }}</a>
+          </p>
+        </div>
+        <!-- end kontakt card -->
+
+      </section>
+      <!-- end kontakt -->
+
+      <!-- anmeldung -->
+      <section id="anmeldung">
+        <article>
+          <h2>Anmeldung zum Probetraining</h2>
+          <p>
+            Wir freuen uns über jede und jeden neuen Karateka, egal ob du
+            schonmal Karate oder andere Kampfkunst gemacht hast und auch wenn du
+            noch keine Vorerfahrungen hast.
+          </p>
+          <p>
+            Das Probetraining ist kostenlos. Du kannst einen Monat mitmachen,
+            und dich dann entscheiden, ob du eine Mitgliedschaft abschließen
+            möchtest.
+          </p>
+          <p>
+            <b>
+              Der nächste Anfängerkurs für Kinder startet nach den Sommerferien
+              zum 31.08.2023.
+            </b>
+          </p>
+          <p>
+            Wir sind derzeit eine recht große Kindergruppe. Um ein ausgewogenes
+            und forderndes Training zu gewährleisten, bitten wir um
+            Neuanmeldungen von Anfängern im Karate erst zum nächsten Kurs. Wenn
+            du dir unsicher bist, ob deine Kinder Anfänger sind, dann melde dich
+            gerne telefonisch.
+          </p>
+          <p>
+            <b>
+              Erwachsene können jederzeit zum Probetraining vorbeikommen.
+            </b>
+          </p>
+          <p>
+            Du brauchst:
+            <ul>
+              <li>Badelatschen aus hygienischen Gründen, wir trainieren barfuß.</li>
+              <li>Wasser zum Trinken</li>
+              <li>Lange Hose, kurzes T-Shirt (oder einen Gi)</li>
+            </ul>
+          </p>
+          <p>
+            Melde dich gerne per Mail oder telefonisch, wenn du Fragen hast.
+          </p>
+          <p>
+            <a href="https://joshinkan-werder.kurabu.com/de/join/step-1">
+              Anmeldung zum Probetraining
+            </a>
+            <br/>
+            <a href="https://joshinkan-werder.kurabu.com/de/join/step-1">
+              Mitgliederantrag
+            </a>
+          </p>
+        </article>
+      </section>
+      <!-- end anmeldung -->
+
+    </main>
+
+    {{ include.sh templates/footer.html }}
+  </body>
+</html>

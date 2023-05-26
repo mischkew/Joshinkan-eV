@@ -1,27 +1,32 @@
+# NOTE(sven): We're cheeky for deployment. By setting up the handlers below we
+# can copy basic nginx behaviour using Google App Engine. This gives us the
+# advantage of managed deployments with SSL certificates, basic cookie-free
+# analytics, hosting etc.
+
 runtime: python27
 api_version: 1
 threadsafe: true
 
 skip_files:
-- node_modules/
 - src/
+- logs/
 - .git/
 - .gitignore
-- _config.yml
-- .sass-cache/
-- package.json
-- package-lock.json
-- Gruntfile.coffee
 
 handlers:
+
+- url: /(.*\.(png|jpg|css|js|html))$
+  secure: always
+  static_files: build/\1
+  upload: build/(.*)
+
 - url: /
-  static_files: public/verein/index.html
-  upload: public/verein/index.html
+  secure: always
+  static_files: build/verein.html
+  upload: build/verein.html
 
-- url: /(.*)/
-  static_files: public/\1/index.html
-  upload: public/(.*)/index.html
-
-- url: /(.*)
-  static_files: public/\1
-  upload: public/(.*)
+# Match /<name> urls to top-level html files
+- url: /(.*)$
+  secure: always
+  static_files: build/\1.html
+  upload: build/.*\.html

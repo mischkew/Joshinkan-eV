@@ -1,0 +1,869 @@
+/* TOC
+ 1. Theme Settings
+ 2. Reset CSS
+ 3. Base Styles
+ 4. Application Styles
+*/
+
+@import "/stylesheets/glyphicons.css";
+
+/* -- 1. Theme Settigns -- */
+:root {
+  --rem: 16px;
+  --width: 64rem;
+  --navpos: absolute; /* fixed | absolute */
+  --font-paragraph: 1em/1.7 'Helvetica Neue', Helvetica, 'Open Sans', sans-serif;
+  --font-highlight: 0.9em/1.5 'Helvetica Neue', Helvetica, 'Open Sans', sans-serif;
+  --font-code: 0.9em/1.4 'DejaVu Sans Mono', monospace;
+  --border: 1px solid var(--color-medium);
+  --ornament: '‹‹‹ ›››';
+
+  /* colors */
+  --color-orange: #eb6841;
+  --color-cyan: #00a0b1;
+  --color-red: #b44b50;
+  --color-yellow: #f6ca75;
+
+  --color-foreground: #433;
+  --color-background: #fbfbfb;
+  --color-dark: #888;
+  --color-light: #ddd;
+  --color-medium: #9B9B9B;
+  --color-link: #07c;
+  --color-emphasis: var(--color-orange);
+  --color-emphasis-background: #0881;
+
+  --color-contrast: #fbfbfb;
+  --color-background-contrast: rgba(0,0,0,0.5);
+
+}
+
+/* -- 2. Reset CSS -- */
+/* reset block elements  */
+* {
+  box-sizing: border-box;
+  border-spacing: 0;
+  margin: 0;
+  padding: 0;
+}
+header,
+footer,
+figure,
+table,
+video,
+details,
+blockquote,
+ul,
+ol,
+dl,
+fieldset,
+pre,
+pre > code,
+caption {
+  display: block;
+  margin: 0.5rem 0rem 1rem;
+  width: 100%;
+  overflow: auto hidden;
+  text-align: left;
+}
+video,
+summary,
+input,
+select {
+  outline: none;
+}
+
+/* reset clickable things  (FF Bug: select:hover prevents usage) */
+a,
+button,
+select,
+summary {
+  color: var(--color-link);
+  cursor: pointer;
+}
+
+/* 3. Base Style */
+html {
+  font-size: var(--rem);
+  background: var(--color-background);
+}
+body {
+  position: relative;
+  margin: auto;
+  font: var(--font-paragraph);
+  color: var(--color-foreground);
+}
+body > main {
+  min-width: 360px;
+  margin: 0 auto;
+}
+body > footer {
+  margin: 10rem 0rem 0rem;
+  font-size: 90%;
+}
+p {
+  margin: 0.6em 0;
+}
+
+/* links */
+a[href] {
+  text-decoration: underline solid var(--cmed);
+  text-underline-position: under;
+}
+a[href^='#'] {
+  text-decoration: none;
+}
+a:hover,
+button:not([disabled]):hover,
+summary:hover {
+  filter: brightness(108%);
+  color: var(--color-emphasis);
+  border-color: var(--color-emphasis);
+}
+
+/* lists */
+ul,
+ol,
+dl {
+  margin: 1rem 0;
+  padding: 0 0 0 2em;
+}
+li:not(:last-child),
+dd:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+dt {
+  font-weight: bold;
+}
+
+/* headings */
+h1,
+h2,
+h3 {
+  margin: 1.5rem 0 0.5rem;
+  line-height: 1.2em;
+  clear: both;
+}
+h1 + h2,
+h2 + h3,
+h3 + h4,
+h4 + h5 {
+  margin-top: 0.5em;
+  padding-top: 0;
+} /* non-clashing headings */
+h1 {
+  font-size: 6em;
+  font-weight: 300;
+  text-align: center;
+  margin: 5rem 0;
+}
+h2 {
+  font-size: 2em;
+  font-weight: 300;
+}
+h3 {
+  font-size: 1.5em;
+  font-weight: 400;
+}
+
+/* images */
+img,
+svg {
+  max-width: 100%;
+  vertical-align: text-top;
+  object-fit: cover;
+}
+
+/* forms */
+input {
+  width: 100%;
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 0.1rem solid var(--color-medium);
+}
+::selection,
+mark {
+  background: var(--color-link);
+  color: var(--color-background);
+}
+
+/* buttons */
+
+button,
+select {
+  font: var(--font-highlight);
+  border-radius: 4px;
+  border: 1.5px solid var(--color-medium);
+  padding: 0.4em 0.8em;
+  font-weight: bold;
+  background-color: var(--color-light);
+  margin: 0.5em;
+  border: 1.5px solid var(--color-link);
+}
+button {
+  padding: 0.4em 1em;
+  font-size: 85%;
+  letter-spacing: 0.1em;
+}
+button[disabled] {
+  color: var(--color-dark);
+  border-color: var(--color-medium);
+  cursor: not-allowed;
+}
+
+button > img {
+  height: 1.2em;
+  margin-right: 0.4em;
+}
+
+/* -- 4. Application Styles -- */
+
+html {
+  min-width: 360px;
+}
+
+/* Quotes */
+
+blockquote {
+  color: var(--color-medium);
+  font-size: 1rem;
+  border-left: 1px solid var(--color-light);
+  padding: 0.8rem 1.2rem;
+  margin: 0 1.2rem;
+}
+
+blockquote q {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+blockquote q::before {
+  content: '\2014 \00A0';
+}
+
+blockquote q::after {
+  content: '';
+}
+
+
+/* Color Classes */
+
+.orange { color: var(--color-orange); }
+.cyan { color: var(--color-cyan); }
+.red { color: var(--color-red); }
+
+.orange-background { background-color: var(--color-orange); }
+.cyan-background { background-color: var(--color-cyan); }
+.red-background { background-color: var(--color-red); }
+
+/* Icons */
+
+.icon {
+  display: block;
+  float: left;
+  width: 36px;
+  height: 36px;
+  margin: 2px 8px 2px 0;
+}
+
+.icon.facebook {
+  background-image: url(../images/icon_facebook.png);
+}
+
+.icon.email {
+  background-image: url(../images/icon_email.png);
+}
+
+.icon.phone {
+  background-image: url(../images/icon_phone.png);
+}
+
+
+/* Text Content */
+
+main > section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main article {
+  max-width: calc(600px + 3rem);
+  padding: 3rem;
+  background-color: rgba(251,251,251,0.8);
+  backdrop-filter: blur(4px);
+  text-align: justify;
+
+  display: flex;
+  flex-direction: column;
+}
+
+main article > img,
+main article > .image-with-label {
+  align-self: center;
+}
+
+main article h2 {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+main article h2:first-child {
+  margin-top: 0;
+}
+
+main article p:last-child {
+  margin-bottom: 0;
+}
+
+main article p + h2 {
+  margin-top: 3rem;
+}
+
+main article hr {
+  position: relative;
+  width: 90%;
+  height: 32px;
+  margin: 1.5rem 0;
+  background-image: url(/images/separator.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  border: 0;
+}
+
+main article hr::before,
+main article hr::after {
+  content: "";
+  display: block;
+
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 0;
+
+  border-top: 1px solid var(--color-medium);
+}
+
+main article hr::before {
+  left: 60%;
+}
+
+main article hr::after {
+  right: 60%;
+}
+
+
+/* Cards */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  align-items: center;
+  box-shadow: 4px 4px 24px 0px rgba(0,0,0,0.05);
+}
+
+.card label {
+  position: relative;
+  height: 2rem;
+  margin-top: -1rem;
+}
+
+.card label .badge {
+  display: block;
+  position: absolute;
+  z-index: 100;
+  left: -0.8rem;
+
+  height: 2rem;
+  width: 2rem;
+  padding: 0.2rem;
+
+  border: 1px solid;
+  border-radius: 3rem;
+
+  line-height: 1.4;
+  text-align: center;
+
+  background-color: var(--color-background);
+}
+
+.card label .badge.orange {
+  border-color: var(--color-orange);
+}
+
+.card label .badge.cyan {
+  border-color: var(--color-cyan);
+}
+
+.card label .subtext {
+  line-height: 1.5;
+  padding: 0.2rem 0.8rem 0.2rem 1.6rem;
+  height: 2rem;
+  display: block;
+  border-radius: 0 3rem 3rem 0;
+  color: var(--color-contrast);
+}
+
+.card h3 {
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.card p {
+  text-align: center;
+  font-size: 0.9em;
+  margin: 1.4rem 0;
+}
+
+/* Image with a Label Overlay */
+/* Usage: <div class="image-with-label"><img><label>Label Text</label></div> */
+
+.image-with-label,
+article > img {
+  display: inline-block;
+  position: relative;
+  max-height: 40rem;
+  margin: 2rem;
+}
+
+.image-with-label img {
+  max-height: 40rem;
+}
+
+.image-with-label label {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  padding: 0.5rem;
+  color: var(--color-contrast);
+  background-color: var(--color-background-contrast);
+}
+
+/* Parallax Banner */
+/* Usage:
+     <div class="banner parallex my-class"></div>
+
+   Assign a custom background image to my-class.
+*/
+.banner {
+  width: 100%;
+  height: 748px;
+  overflow: hidden;
+}
+
+.banner.parallax {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Verein */
+
+#trainingszeiten {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-evenly;
+  margin-bottom: 4rem;
+  padding: 0 1rem;
+}
+
+#verein-wrapper {
+  width: 100%;
+  min-height: 1000px;
+  background-image: url(../images/background_verein_large.png);
+  background-position: top center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 440px 1rem 0 1rem;
+}
+
+/* Training */
+
+#training-overview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-emphasis-background);
+  padding: 6rem 0 2rem 0;
+}
+
+h1.training {
+  margin-bottom: 0;
+}
+
+.scroll-top {
+  position: fixed;
+  z-index: 999;
+  top: 5%;
+  left: 5%;
+  width: 50px;
+  height: 50px;
+  display: none;
+}
+
+.scroll-top span {
+  transition: opacity 0.1s ease-in;
+    background-color: var(--color-background-contrast);
+    opacity: 0.3;
+    padding: 5px;
+    color: white;
+    font-size: 40px;
+    border-radius: 8px;
+}
+
+blockquote.training {
+  max-width: 18rem;
+  margin: 2rem auto 5rem auto;
+}
+
+#training-overview .training-aspects {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  max-width: calc(2 * 256px + 2rem);
+}
+
+#training-overview .training-aspect {
+  position: relative;
+  display: block;
+  width: 256px;
+  height: 256px;
+  box-shadow: 0 2px 3px var(--color-background-contrast);
+}
+
+#training-overview .training-aspect label {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 1rem;
+  padding: 0.5rem;
+  color: var(--color-contrast);
+  background-color: var(--color-background-contrast);
+  cursor: pointer;
+  width: calc(90% - 0.5rem);
+}
+
+#training-overview .training-aspect label h3 {
+  font-weight: 100;
+  margin: 0.5rem 0;
+}
+
+#training-overview .training-aspect label span {
+  font-weight: 200;
+}
+
+#training-overview .training-aspect .scroll-down {
+  position: absolute;
+  width: 100%;
+  height: 3rem;
+  background-color: var(--color-background-contrast);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-contrast);
+  font-size: 2.4rem;
+  visibility: hidden;
+}
+
+#training-overview .training-aspect:hover .scroll-down {
+  visibility: visible;
+}
+
+
+#training-overview .training-aspect.kata::before {
+  top: -77px;
+  left: -58px;
+  background-image: url(/images/spots.png);
+  display: block;
+  content: "";
+  width: 164px;
+  height: 192px;
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@media screen and (min-width: 64rem) {
+  #training-overview .training-aspects {
+    margin-left: calc(-425px / 2);
+  }
+
+  #training-overview .kobudo::after {
+    display: block;
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url(/images/karateka.png);
+    width: 425px;
+    height: 524px;
+    top: calc(2rem + 3px);
+    left: 100%;
+  }
+
+  #training-overview .kobudo:hover::after {
+    filter: brightness(0.90);
+  }
+}
+
+#kata-und-bunkai {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.banner-kobudo {
+  background-image: url(/images/kobudo_banner.jpg);
+}
+
+#kobudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 160px;
+  background-image: url(/images/sai_banner.jpg);
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+#kobudo article {
+  background-color: var(--color-background);
+}
+
+#kobudo article:first-child {
+  box-shadow: 0 2px 3px var(--color-background-contrast);
+}
+
+#kobudo .weapon-collection {
+  max-width: calc(672px + 3rem);
+  margin: -3rem 0;
+}
+
+#ne-waza {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 3rem 0;
+}
+
+#ne-waza .images-stacked {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6rem;
+  max-height: 512px;
+}
+@media screen and (max-width: 48rem) {
+  #ne-waza .images-stacked {
+    display: none;
+  }
+}
+
+#ne-waza .images-stacked img {
+  position: relative;
+  float: left;
+  width: 25%;
+  min-height: 1px;
+  box-shadow: 0 2px 3px var(--color-background-contrast);
+}
+
+#ne-waza .images-stacked img:first-child {
+  transform: translate(17.19%, 15.6%);
+}
+
+#ne-waza .images-stacked img:last-child {
+  transform: translate(-17.19%, 15.6%);
+  z-index: -1;
+}
+
+#ne-waza .images-straight {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#ne-waza .images-straight img {
+  max-height: 256px;
+}
+
+#joshinkan {
+  background-image: url(../images/pots-left.png),url(../images/pots-right.png);
+  background-repeat: no-repeat, no-repeat;
+  background-size: 40% auto, 40% auto;
+  background-position: bottom left, top right;
+}
+/* Kontakt */
+
+#kontakt {
+  max-width: 600px;
+  padding: 0 1rem;
+  margin: 0 auto;
+}
+
+#anmeldung {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
+}
+
+/* Header Menu */
+
+body > header {
+  position: relative;
+  margin: 0 auto;
+  padding-top: 4rem;
+  background-image: url(../images/header_background_large.jpg);
+  max-width: 1920px;
+  min-height: 440px;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+}
+
+body > header a {
+  background-color: var(--color-background-contrast);
+  color: var(--color-contrast);
+}
+
+body > header .site-title {
+  padding: 0 1.5rem;
+  font-size: 4.5rem;
+  line-height: 1.4;
+}
+body > header .site-title:hover {
+  color: var(--color-emphasis);
+}
+@media screen and (max-width: 48rem) {
+  body > header .site-title {
+    display: block;
+  }
+}
+
+body > header nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2.5rem 0;
+}
+
+body > header nav a {
+  font-size: 3rem;
+  line-height: 1.4;
+  padding: 0 2rem;
+  margin: 0.5rem 0;
+}
+
+body > header .contact {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0;
+}
+
+/* Footer Menu */
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+
+  background-color: var(--color-red);
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  overflow: visible;
+}
+
+footer img {
+  width: 16rem;
+  margin-top: -8rem;
+}
+
+footer > section {
+  display: flex;;
+}
+
+footer a {
+  color: var(--color-contrast);
+}
+
+footer a:hover {
+  color: var(--color-yellow);
+}
+
+footer .site-structure {
+  flex-wrap: wrap;
+  gap: 3rem;
+  justify-content: center;
+  align-content: flex-start;
+}
+
+footer .site-structure nav {
+  display: flex;
+  flex-direction: column;
+}
+
+footer .site-structure hr {
+  height: 1px;
+  color: var(--color-contrast);
+  opacity: 0.5;
+  border: 0;
+  border-top: 1px solid var(--color-contrast);
+  margin-top: 0.2rem;
+  margin-bottom: 1rem;
+}
+
+footer .site-structure .page-title {
+  font-size: 1.2rem;
+  font-weight: 200;
+  color: var(--color-contrast);
+}
+
+footer .contact-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+footer .contact {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  height: 36px;
+}
+
+footer .contact a {
+  line-height: 1.4;
+  font-size: 1rem;
+}
+
+
+@media screen and (max-width: 38rem) {
+  footer .site-structure nav {
+    width: 40%;
+  }
+}
+
+
+footer .bottom-links {
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-contrast);
+}
+
+
+footer .bottom-links .copyright {
+  font-weight: 200;
+}

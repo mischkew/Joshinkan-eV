@@ -1,214 +1,286 @@
----
-layout: default
-title: Training
-permalink: /training/
-order: 2
----
+<html>
+  <head>
+    <title>Training</title>
+    {{ cat templates/metadata.html }}
+  </head>
+  <body>
+    {{ include.sh templates/header.html }}
 
-<a
-  class="scroll-top"
-  href="#training-overview"
-  data-scroll="true"
-  data-scroll-time="1000"
-  data-show-after="#kata-und-bunkai">
-  <span class="glyphicon glyphicon-circle-arrow-up"></span>
-</a>
+    <main>
 
-<div id="training-overview" class="frame">
-  <h1 class="page-title cyan">Training</h1>
+      <a
+        class="scroll-top"
+        href="#header"
+        data-scroll="true"
+        data-scroll-time="1000"
+        data-show-after="#training-overview">
+        <span class="glyphicon glyphicon-circle-arrow-up"></span>
+      </a>
 
-  <!-- training overview -->
-  <div  class="training-overview">
 
-    <div class="training-aspects-wrapper">
+<h1 class="cyan training">Training</h1>
 
-      <div class="quote-wrapper reveal-animation animated fade-in">
-        <blockquote>
-          <p>Du kannst nur so gut kämpfen, wie du trainierst.</p>
-          <footer>Miyamoto Musashi</footer>
-        </blockquote>
+<blockquote class="training">
+  <p>Du kannst nur so gut kämpfen, wie du trainierst.</p>
+  <q>Miyamoto Musashi</q>
+</blockquote>
+
+<!-- training overview -->
+<section id="training-overview">
+
+  <div class="training-aspects">
+    <!-- kata-und-bunkai -->
+    <a
+      class="training-aspect kata"
+      href="#kata-und-bunkai"
+      data-scroll="true"
+      data-scroll-time="500">
+      <div class="scroll-down">
+        <span class="glyphicon glyphicon-circle-arrow-down"></span>
       </div>
+      <img src="/images/aspect_kata_und_bunkai.jpg">
+      <label>
+        <h3>Kata und Bunkai</h3>
+        <span>
+          Von traditionellen Formen zur Selbstverteidigung
+        </span>
+      </label>
+    </a>
+    <!-- end kata-und-bunkai -->
 
-      <!-- kata-und-bunkai -->
-      <a
-        class="training-aspect reveal-animation animated fade-in-left"
-        href="#kata-und-bunkai"
-        data-scroll="true"
-        data-scroll-time="500">
-        <div class="training-aspect-inner kata-und-bunkai">
-          <div class="scroll-down"><span class="glyphicon glyphicon-circle-arrow-down"></span></div>
-          <img src="/images/aspect_kata_und_bunkai.jpg">
-          <div class="image-label">
-            <h3 class="label-header">Kata und Bunkai</h3>
-            <span class="label-text-small">Von traditionellen Formen zur Selbstverteidigung</span>
-          </div>
-        </div>
-      </a> <!-- end kata-und-bunkai -->
+    <!-- kobudo -->
+    <a
+      class="training-aspect kobudo"
+      href="#kobudo"
+      data-scroll="true"
+      data-scroll-time="1000">
+      <div class="scroll-down">
+        <span class="glyphicon glyphicon-circle-arrow-down"></span>
+      </div>
+      <img src="/images/aspect_kobudo.jpg">
+      <label>
+        <h3>Kobudo</h3>
+        <span>Traditionelle japanische Waffen</span>
+      </label>
+    </a>
+    <!-- end kobudo -->
 
-      <!-- kobudo -->
-      <a
-        class="training-aspect reveal-animation animated fade-in-right"
-        href="#kobudo"
-        data-scroll="true"
-        data-scroll-time="1000">
-        <div class="training-aspect-inner kobudo">
-          <div class="scroll-down"><span class="glyphicon glyphicon-circle-arrow-down"></span></div>
-          <img src="/images/aspect_kobudo.jpg">
-          <div class="image-label">
-            <h3 class="label-header">Kobudo</h3>
-            <span class="label-text-small">Traditionelle japanische Waffen</span>
-          </div>
-        </div>
-      </a> <!-- end kobudo -->
+    <!-- ne waza -->
+    <a
+      class="training-aspect"
+      href="#ne-waza"
+      data-scroll="true"
+      data-scroll-time="1500">
+      <div class="scroll-down">
+        <span class="glyphicon glyphicon-circle-arrow-down"></span>
+      </div>
+      <img src="/images/aspect_newaza.jpg">
+      <label>
+        <h3>Ne-Waza</h3>
+        <span>Bodenkampf</span>
+      </label>
+    </a>
+    <!-- end ne waza -->
 
-      <!-- ne waza -->
-      <a
-        class="training-aspect reveal-animation animated fade-in-left"
-        href="#ne-waza"
-        data-scroll="true"
-        data-scroll-time="1500">
-        <div class="training-aspect-inner">
-          <div class="scroll-down"><span class="glyphicon glyphicon-circle-arrow-down"></span></div>
-          <img src="/images/aspect_newaza.jpg">
-          <div class="image-label">
-            <h3 class="label-header">Ne-Waza</h3>
-            <span class="label-text-small">Bodenkampf</span>
-          </div>
-        </div>
-      </a> <!-- end ne waza -->
+    <!-- joshinkan -->
+    <a
+      class="training-aspect"
+      href="#joshinkan"
+      data-scroll="true"
+      data-scroll-time="2000">
+      <div class="scroll-down">
+        <span class="glyphicon glyphicon-circle-arrow-down"></span>
+      </div>
+      <img src="/images/aspect_joshinkan.jpg">
+      <label>
+        <h3>Joshinkan</h3>
+        <span>Internationaler Verband</span>
+      </label>
+    </a>
+    <!-- end joshinkan -->
 
-      <!-- joshinkan -->
-      <a
-        class="training-aspect reveal-animation animated fade-in-up"
-        href="#joshinkan"
-        data-scroll="true"
-        data-scroll-time="2000">
-        <div class="training-aspect-inner">
-          <div class="scroll-down"><span class="glyphicon glyphicon-circle-arrow-down"></span></div>
-          <img src="/images/aspect_joshinkan.jpg">
-          <div class="image-label">
-            <h3 class="label-header">Joshinkan</h3>
-            <span class="label-text-small">Internationaler Verband</span>
-          </div>
-        </div>
-      </a> <!-- end joshinkan -->
+  </div> <!-- end training aspects -->
+</section>
+<!-- end training overview -->
 
-    </div> <!-- end training aspects wrapper -->
-
-  </div> <!-- end training overview -->
-</div>
-
-<div id="kata-und-bunkai" class="kata-und-bunkai-frame">
-  <div class="kata-und-bunkai-image">
+<!-- kata und bunkai -->
+<section id="kata-und-bunkai">
+  <div class="image-with-label">
     <img src="/images/john_sensei_large.jpg">
-    <div class="image-label">
-      <span class="label-text">
-        Sensei John Ingham (7. Dan Goju-Ryu) aus Australien zu Besuch in Werder
-      </span>
-    </div>
+    <label>
+      Sensei John Ingham (7. Dan Goju-Ryu) aus Australien zu Besuch in Werder
+    </label>
   </div>
-  <div class="kata-und-bunkai-text">
-    <h2 class="text-header">Kata und Bunkai</h2>
-    <div class="text-block clearfix">
-    {% markdown %}
-Die Ausführung von komplexen Techniken mit oder ohne Waffen, in einer Abfolge von Bewegungen, Schlägen und Tritten gegen einen imaginären Gegner, wird als „Kata“ bezeichnet. Die Kata dient dazu, Kampfszenarien zu konservieren und auch ohne Partner zu üben. Die Bedeutung der Bewegungen wird durch „Bunkai“ entschlüsselt. Jeder Karateka sollte die Anwendung der Techniken kennen, ansonsten wird die Kata lediglich zu einem Showelement. Selbst eine einzige Sequenz kann, je nach Kenntnisstand des Karateka, mehrere Bedeutungen haben. In unserem Karatesystem folgen wir dem traditionellen Ansatz des Okinawa-Karate, welcher Bunkai zum Kern hat und in dem Kata dem individuellen Training und spirituell-mentalen Zwecken bzw. der technischen Vervollständigung dient.
-    {% endmarkdown %}
-    <div class="text-separator"></div>
-    {% markdown %}
-Das Isshinryu-Karate-System des Joshinkan enthält acht waffenlose Kata sowie eine Vielzahl von traditionellen Kobudo-Kata (Waffen).
-    {% endmarkdown %}
-    </div>
-  </div>
-</div>
+  <article>
+    <h2>Kata und Bunkai</h2>
+    <p>
+      Die Ausführung von komplexen Techniken mit oder ohne Waffen, in einer
+      Abfolge von Bewegungen, Schlägen und Tritten gegen einen imaginären
+      Gegner, wird als „Kata“ bezeichnet. Die Kata dient dazu, Kampfszenarien zu
+      konservieren und auch ohne Partner zu üben. Die Bedeutung der Bewegungen
+      wird durch „Bunkai“ entschlüsselt. Jeder Karateka sollte die Anwendung der
+      Techniken kennen, ansonsten wird die Kata lediglich zu einem
+      Showelement. Selbst eine einzige Sequenz kann, je nach Kenntnisstand des
+      Karateka, mehrere Bedeutungen haben. In unserem Karatesystem folgen wir
+      dem traditionellen Ansatz des Okinawa-Karate, welcher Bunkai zum Kern hat
+      und in dem Kata dem individuellen Training und spirituell-mentalen Zwecken
+      bzw. der technischen Vervollständigung dient.
+    </p>
+    <hr />
+    <p>
+      Das Isshinryu-Karate-System des Joshinkan enthält acht waffenlose Kata
+      sowie eine Vielzahl von traditionellen Kobudo-Kata (Waffen).
+    </p>
+  </article>
+</section>
+<!-- end kata und bunkai -->
 
 <div class="banner parallax banner-kobudo"></div>
 
-<div id="kobudo" class="kobudo-frame">
+<!-- kobudo -->
+<section id="kobudo">
+  <article>
+    <h2>Kobudo - Waffenkunst</h2>
+    <p>
+      Kobudo beschreibt die Verwendung von traditionellen japanischen
+      Waffen. Die Entwicklung des Kobudo wurde maßgeblich durch den historischen
+      Aspekt des Verbots des Besitzes von schneidenden Waffen im
+      mittelalterlichen Okinawa geprägt. Vor allem rechtlose Bauern entwickelten
+      und perfektionierten Waffen aus landwirtschaftlichen Geräten, wie
+      Dreschflegel (Nunchaku), Stangen zum Wassertragen (Bo), Sensen (Kama),
+      Pferdegeschirr und Hufeisen (Tekko) u.v.m. sowie deren Anwendung. Auch
+      hier haben sich Trainingsformen entwickelt, wie Kata und der Kampf
+      zwischen verschiedenen Waffensystemen (z.B. Kumite Sai vs. Bo). Die
+      Schüler erlernen zunächst den Umgang mit dem Stab (Bo) und später mit Sai
+      und Tonfa. Weiterführend folgen wir dem System des Tokushinryu, in dem 13
+      traditionelle Waffen zur Anwendung kommen (Kama, Tekko, Tichu, Tinbe
+      u.w.). Karate und Kobudo sind als gemeinsames System zu betrachten, denn
+      traditionell musste man sich mit bloßen Händen auch gegen eine Waffe
+      verteidigen können, was umso besser gelang, wenn man diese auch selbst
+      beherrschte.
+    </p>
+  </article>
 
-  <h2 class="text-header white">Kobudo</h2>
-  <div class="kobudo-text framed-text-block text-block-col">
-  {% markdown %}
-### "Kobudo" - Waffenkunst ###
-Kobudo beschreibt die Verwendung von traditionellen japanischen Waffen. Die Entwicklung des Kobudo wurde maßgeblich durch den historischen Aspekt des Verbots des Besitzes von schneidenden Waffen im mittelalterlichen Okinawa geprägt. Vor allem rechtlose Bauern entwickelten und perfektionierten Waffen aus landwirtschaftlichen Geräten, wie Dreschflegel (Nunchaku), Stangen zum Wassertragen (Bo), Sensen (Kama), Pferdegeschirr und Hufeisen (Tekko) u.v.m. sowie deren Anwendung. Auch hier haben sich Trainingsformen entwickelt, wie Kata und der Kampf zwischen verschiedenen Waffensystemen (z.B. Kumite Sai vs. Bo). Die Schüler erlernen zunächst den Umgang mit dem Stab (Bo) und später mit Sai und Tonfa. Weiterführend folgen wir dem System des Tokushinryu, in dem 11 traditionelle Waffen zur Anwendung kommen (Kama, Tekko, Tichu, Tinbe u.w.). Karate und Kobudo sind als gemeinsames System zu betrachten, denn traditionell musste man sich mit bloßen Händen auch gegen eine Waffe verteidigen können, was umso besser gelang, wenn man diese auch selbst beherrschte.
-Nach bestandener Kobudo-Prüfung erhält der Schüler, je nach Graduierung, einen farblichen Balken über dem Joshinkan-Abzeichen am linken Ärmel.
-  {% endmarkdown %}
-  </div>
+  <img class="weapon-collection" src="/images/weapon_collection.jpg">
 
-  <div class="weapon-collection">
-    <div class="image-container">
-      <img src="/images/weapon_collection.jpg">
+
+  <article>
+    <h2>Tokushinryu</h2>
+    <p>
+      Eine besondere Komponente des Isshinryu stellen das Training und der Kampf
+      mit traditionellen Waffen dar. In Okinawa selbst gibt es zwischen den
+      verschiedenen Karateschulen, Stilen und deren Meistern eine enge
+      Verbundenheit. So trainieren Gojuryu- und Isshinryu-Meister auch zusammen
+      mit Kobudolehrern, um ihr Wissen und Können zu erweitern, so wie es über
+      Jahrhunderte der Fall war. Die Isshinryu-Lehrmeister Uezu Sensei und Uechi
+      Sensei haben uns im Verlaufe der Zeit Zugang zu Sensei Tokumura
+      ermöglicht. Sensei Tokumura ist 1941 geboren und trainiert Gojuryu. Er
+      folgt gleichzeitig einem traditionellen Kobudosystem, das er als
+      Tokushinryu bezeichnet. Dabei kommt eine Vielzahl traditioneller Waffen
+      zum Einsatz.
+    </p>
+
+    <div class="image-with-label">
+      <img src="/images/tokumura_sensei.jpg" alt="Tokumura Sensei mit Tinbe">
+      <label>Tokumura Sensei mit Tinbe und Rochin</label>
     </div>
+
+    <p>
+      Joshinkan Werder sieht in der Kampfkunst des Tokushinryu, in das die
+      Isshinryu-Waffen-Kata bereits implementiert sind, eine perfekte Ergänzung,
+      zumal uns das Training in Okinawa in ursprünglichen Dojos offensteht.
+      Tokushinryu wird von vielen Kampfsportschulen des Jiu-Jitsu,
+      Kyunkushinkai, Gojuryu, Isshinryu u.a. trainiert, da es den eigenen
+      Kampfstil in jeder Weise optimiert ohne in Konkurrenz mit Verbänden,
+      Wettkampfsystemen oder internen Prüfungsabläufen zu stehen. Zur Abgrenzung
+      werden bei den Trainingseinheiten auch schwarze Gi-Jacken getragen.
+    </p>
+  </article>
+
+</section>
+<!-- end kobudo -->
+
+<!-- ne-waza -->
+<section id="ne-waza">
+  <div class="images-stacked">
+    <img src="/images/ne-waza-1.jpg">
+    <img src="/images/ne-waza-2.jpg">
+    <img src="/images/ne-waza-3.jpg">
   </div>
 
-  <div class="kobudo-text framed-text-block text-block-col">
-  {% markdown %}
-### Tokushinryu ###
+  <article>
+    <h2 class="text-header">Ne-Waza</h2>
+    <p>
+      Eine wichtige Lektion beim Training mit Skateboard oder Inline-Skatern ist
+      das Hinfallen. Es heißt, wer nicht fallen kann, sollte nicht fahren. Im
+      Karate ist es nach unserem Verständnis ähnlich. Angelehnt an die
+      Selbstverteidigung, in der keine sportlichen Regeln gelten, sondern Hilfe
+      für Andere und Selbsthilfe die Prämissen sind, muss eine Situation auch am
+      Boden beherrschbar sein. Dazu zählen Festhaltegriffe, Hebel, Falltechniken
+      und Würgen, wie sie im Jiu-Jitsu bekannt sind und einen festen Bestandteil
+      unseres Trainings darstellen.
+    </p>
+  </article>
 
-Eine besondere Komponente des Isshinryu stellen das Training und der Kampf mit traditionellen Waffen dar. In Okinawa selbst gibt es zwischen den verschiedenen Karateschulen, Stilen und deren Meistern eine enge Verbundenheit. So trainieren Gojuryu- und Isshinryu-Meister auch zusammen mit Kobudolehrern, um ihr Wissen und Können zu erweitern, so wie es über Jahrhunderte der Fall war. Die Isshinryu-Lehrmeister Uezu Sensei und Uechi Sensei haben uns im Verlaufe der Zeit Zugang zu Sensei Tokumura ermöglicht. Sensei Tokumura ist 1941 geboren und trainiert Gojuryu. Er folgt gleichzeitig einem traditionellen Kobudosystem, das er als Tokushinryu bezeichnet. Dabei kommt eine Vielzahl traditioneller Waffen zum Einsatz.
-
-<div class="text-block-image">
-  <img src="/images/tokumura_sensei.jpg" alt="Tokumura Sensei mit Tinbe">
-  <div class="image-label">
-    <span class="label-text">Tokumura Sensei mit Tinbe</span>
+  <div class="images-straight">
+    <img src="/images/ne-waza-4.jpg">
+    <img src="/images/ne-waza-5.jpg">
+    <img src="/images/ne-waza-6.jpg">
   </div>
-</div>
+</section>
+<!-- end ne-waza -->
 
-Joshinkan Werder sieht in der Kampfkunst des Tokushinryu, in das die Isshinryu-Waffen-Kata bereits implementiert sind, eine perfekte Ergänzung, zumal uns das Training in Okinawa in ursprünglichen Dojos offensteht.
-Tokushinryu wird von vielen Kampfsportschulen des Jiu-Jitsu, Kyunkushinkai, Gojuryu, Isshinryu u.a. trainiert, da es den eigenen Kampfstil in jeder Weise optimiert ohne in Konkurrenz mit Verbänden, Wettkampfsystemen oder internen Prüfungsabläufen zu stehen. Zur Abgrenzung werden bei den Trainingseinheiten auch schwarze Gi-Jacken getragen.
-  {% endmarkdown %}
-  </div>
+<!-- joshinkan -->
+<section id="joshinkan">
 
-</div>
+  <article>
+    <h2>Joshinkan – Das System</h2>
+    <p>
+      Der Begriff Joshinkan steht in doppelter Bedeutung. Die Übersetzung der
+      Schriftzeichen führt zur Transliteration „Stils mit herausragendem Geist“
+      (besser verständlich durch den englischen Begriff „Spirit“). Der
+      zugrundeliegende Karatestil Isshinryu ist in Okinawa angesiedelt. Auch
+      Isshinryu lässt sich in ähnlicher Weise als „Schule der Kämpfer mit
+      besonderem Herzen/Einstellung“ übersetzen. Somit finden sich in den
+      Schriftzeichen des Joshinkan auch die Elemente des Isshinryu.  Das
+      Joshinkan-System erweitert den eigentlichen Karatestil des Isshinryu um
+      das Element des Bodenkampfes sowie durch eine Vielzahl von
+      anfängerfreundlichen sogenannten Kobudo-„Kihon“-Formen, einer Vorstufe zur
+      Kata mit Waffen.
+    </p>
+    <p>
+      Joshinkan implementiert die drei Elemente Karate, Waffenkampf und
+      Bodenkampf, was sich auch in Form der drei Schwingen des Joshinkan-Symbols
+      wiederfindet. Diese wiederum sind angelehnt an die historische Flagge
+      Okinawas, in welcher die drei Protektorate des ehemaligen
+      Ryu-Kyu-Königreiches als Schwingen dargestellt sind.
+    </p>
+    <img src="/images/emblem.jpg">
+    <h2>Joshinkan International</h2>
+    <p>
+      Das Joshinkan-System wurde von Sensei Lars Andersen (Honbu-Dojo Dänemark),
+      entwickelt und findet Anwendung in Dojos in Dänemark, Deutschland,
+      Rumänien und Kosovo. Es bestehen weitere enge Verbindungen zu
+      internationalen Isshinryu-Schulen in den USA und anderen
+      Staaten. Joshinkan steht in direkter Linie zu Meistern in Okinawa, die
+      sowohl Isshinryu-Karate als auch Kobudo lehren. Die Kooperation der
+      Joshinkan-Verbände hat die Konservierung der traditionellen Formen und
+      Kenntnisse der Kampfkunst zum Ziel.
+    </p>
+    <p>
+      Darüber hinaus pflegen wir enge Beziehungen zu anderen Karateschulen und
+      Stilen, z.B. in Australien, wo wir mit Sensei John Ingham (Nippon Den
+      Kempo Karate) traditionelles Gojuryu-Karate vertiefen, das viele
+      Bezugspunkte zum Isshinryu-Karate hat.  Auch richten wir gemeinsam mit
+      Gojuryu-Vereinen aus Berlin (Seibukan) und Sachsen-Anhalt (Karateclub Zen)
+      Seminare aus.
+    </p>
+</section>
+<!-- end joshinkan -->
 
-<div id="ne-waza" class="ne-waza-frame">
-  <div class="ne-waza-images-stacked">
-    <div class="image-container"><img src="/images/ne-waza-1.jpg"></div>
-    <div class="image-container"><img src="/images/ne-waza-2.jpg"></div>
-    <div class="image-container"><img src="/images/ne-waza-3.jpg"></div>
-  </div>
 
-  <h2 class="text-header">Ne-Waza</h2>
-  <div class="text-block text-block-col">
-  {% markdown %}
-Eine wichtige Lektion beim Training mit Skateboard oder Inline-Skatern ist das Hinfallen. Es heißt, wer nicht fallen kann, sollte nicht fahren. Im Karate ist es nach unserem Verständnis ähnlich. Angelehnt an die Selbstverteidigung, in der keine sportlichen Regeln gelten, sondern Hilfe für Andere und Selbsthilfe die Prämissen sind, muss eine Situation auch am Boden beherrschbar sein. Dazu zählen Festhaltegriffe, Hebel, Falltechniken und Würgen, wie sie im Jiu-Jitsu bekannt sind und einen festen Bestandteil unseres Trainings darstellen.
-  {% endmarkdown %}
-  </div>
+    </main>
 
-  <div class="ne-waza-images-straight">
-    <div class="image-container"><img src="/images/ne-waza-4.jpg"></div>
-    <div class="image-container"><img src="/images/ne-waza-5.jpg"></div>
-    <div class="image-container"><img src="/images/ne-waza-6.jpg"></div>
-  </div>
-</div>
-
-<div id="joshinkan" class="joshinkan-frame">
-
-  <div class="joshinkan-text-frame">
-    <h2 class="text-header">Joshinkan</h2>
-    <div class="text-block">
-  {% markdown %}
-### „Joshinkan“ – Das System ###
-
-Der Begriff Joshinkan steht in doppelter Bedeutung. Die Übersetzung der Schriftzeichen führt zur Transliteration „Stils mit herausragendem Geist“ (besser verständlich durch den englischen Begriff „Spirit“). Der zugrundeliegende Karatestil Isshinryu ist in Okinawa angesiedelt. Auch Isshinryu lässt sich in ähnlicher Weise als „Schule der Kämpfer mit besonderem Herzen/Einstellung“ übersetzen. Somit finden sich in den Schriftzeichen des Joshinkan auch die Elemente des Isshinryu.
-Das Joshinkan-System erweitert den eigentlichen Karatestil des Isshinryu um das Element des Bodenkampfes sowie durch eine Vielzahl von anfängerfreundlichen sogenannten Kobudo-„Kihon“-Formen, einer Vorstufe zur Kata mit Waffen.
-Joshinkan implementiert die drei Elemente Karate, Waffenkampf und Bodenkampf, was sich auch in Form der drei Schwingen des Joshinkan-Symbols wiederfindet.
-  {% endmarkdown %}
-    <div class="text-separator"></div>
-  {% markdown %}
-Diese wiederum sind angelehnt an die historische Flagge Okinawas, in welcher die drei Protektorate des ehemaligen Ryu-Kyu-Königreiches als Schwingen dargestellt sind.
-  {% endmarkdown %}
-    </div>
-      <div class="joshinkan-emblem">
-        <img src="/images/emblem.jpg">
-      </div>
-    <div class="text-block">
-  {% markdown %}
-### Joshinkan International ###
-
-Das Joshinkan-System wurde von Sensei Lars Andersen (Honbu-Dojo Dänemark), entwickelt und findet Anwendung in Dojos in Dänemark, Deutschland, Rumänien und Kosovo. Es bestehen weitere enge Verbindungen zu internationalen Isshinryu-Schulen in den USA und anderen Staaten. Joshinkan steht in direkter Linie zu Meistern in Okinawa, die sowohl Isshinryu-Karate als auch Kobudo lehren. Die Kooperation der Joshinkan-Verbände hat die Konservierung der traditionellen Formen und Kenntnisse der Kampfkunst zum Ziel.
-Darüber hinaus pflegen wir enge Beziehungen zu anderen Karateschulen und Stilen, z.B. in Australien, wo wir mit Sensei John Ingham (Nippon Den Kempo Karate) traditionelles Gojuryu-Karate vertiefen, das viele Bezugspunkte zum Isshinryu-Karate hat.
-Auch richten wir gemeinsam mit Gojuryu-Vereinen aus Berlin (Seibukan) und Sachsen-Anhalt (Karateclub Zen) Seminare aus.
-  {% endmarkdown %}
-    </div> <!-- end text-block -->
-  </div> <!-- end joshinkan-text-frame -->
-</div>
+    {{ include.sh templates/footer.html }}
+  </body>
+</html>
