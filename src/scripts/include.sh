@@ -20,6 +20,11 @@ if [ ! -f $1 ]; then
    exit 1
 fi
 
+if [ -z "$(which realpath)" ]; then
+  echo "realpath not found"
+  exit 1
+fi
+
 export PATH="$(realpath $(dirname $0)):$PATH"
 source $(dirname $0)/../variables.ini
 
@@ -28,6 +33,11 @@ cd $(dirname $1)
 SED=sed
 if [ "$(uname -s)" = "Darwin" ]; then
   SED=gsed
+fi
+
+if [ -z "$(which $SED)" ]; then
+  echo "$SED not found"
+  exit 1
 fi
 
 # Find all substitution commands and split them on a new line

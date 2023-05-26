@@ -1,13 +1,13 @@
 .PHONY: all assets build sed start stop reload logs-error logs-access
 all: build
 
-# TODO: complain if realpath is not present
-
 # GNU sed is required for shell substitution. Use brew to install it on OSX if
 # it is not present.
 SYSTEM_NAME = $(shell uname -s)
 GSED_PATH = $(shell which gsed)
 
+# NOTE(sven): Install gnu-sed on OSX as otherwise shell command substitution is
+# not supported, which we need for templating.
 sed:
 ifeq ($(SYSTEM_NAME), Darwin)
 ifeq (,$(GSED_PATH))
