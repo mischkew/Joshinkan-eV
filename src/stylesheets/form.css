@@ -1,0 +1,69 @@
+[hidden] {
+  display: none;
+}
+
+fieldset label input {
+  width: auto;
+  margin: 0 0.5rem;
+}
+
+fieldset {
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-cyan);
+}
+
+fieldset.borderless {
+  border: none;
+}
+
+fieldset legend {
+  font-weight: bold;
+  padding: 0 1rem;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+/* TODO(sven): Shift to right so it does not overflow on mobile view */
+.tooltip .tooltip-text {
+  visibility: hidden;
+  background-color: var(--color-background-much-contrast);
+  color: var(--color-contrast);
+  text-align: center;
+  padding: 0.4rem 0.1rem;
+  border-radius: 0.5rem;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 100;
+  width: 16rem;
+
+  bottom: calc(100% + 0.3rem);
+  left: 50%;
+  margin-left: -8rem; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+/* A little triangle indicator */
+.tooltip .tooltip-text::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--color-background-much-contrast) transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}

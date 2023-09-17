@@ -32,9 +32,11 @@
   --color-link: #07c;
   --color-emphasis: var(--color-orange);
   --color-emphasis-background: #0881;
+  --color-background-red: #ffdbdd;
 
   --color-contrast: #fbfbfb;
   --color-background-contrast: rgba(0,0,0,0.5);
+  --color-background-much-contrast: rgba(0,0,0,0.8);
 
 }
 

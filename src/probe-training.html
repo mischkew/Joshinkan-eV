@@ -1,0 +1,328 @@
+<html>
+  <head>
+    <title>Anmeldung zum Probetraining</title>
+    {{ cat templates/metadata.html }}
+    <style>
+      {{ cat stylesheets/form.css }}
+
+      #data_adult {
+          gap: 1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    {{ cat components/pretty-input.html }}
+
+    <template id="fieldset_child">
+      <style>
+        @import url("/stylesheets/theme.css");
+        @import url("/stylesheets/form.css");
+
+        fieldset {
+            gap: 1rem;
+        }
+      </style>
+      <fieldset show-target="above_18" show-if="no" class="borderless">
+        <legend>Daten deines Kindes</legend>
+        <button type="button" class="plain" onclick="this.parentNode.remove()">
+          Entfernen
+        </button>
+        <pretty-input
+          name="child_first_name[]"
+          required>
+          <span slot="label">Vorname</span>
+        </pretty-input>
+        <pretty-input
+          name="child_last_name[]"
+          required>
+          <span slot="label">Nachname</span>
+        </pretty-input>
+
+        <pretty-input
+          name="child_age[]"
+          min="8"
+          max="17"
+          type="number"
+          required>
+          <span slot="label">Alter</span>
+          <span slot="suffix">Jahre</span>
+        </pretty-input>
+      </fieldset>
+    </template>
+
+    <script type="module">
+      import { loadTemplate } from '/javascripts/lib/template.js';
+
+      class ChildForm extends HTMLElement {
+        constructor() {
+          super();
+
+          const withoutDeleteButton = this.getAttribute("no-delete");
+          const fieldset = loadTemplate('fieldset_child');
+
+          if (withoutDeleteButton !== null) {
+            fieldset.querySelector("button").style.display = 'none';
+          }
+
+          const shadowRoot = this.attachShadow({ mode: 'open' });
+          shadowRoot.appendChild(fieldset);
+        }
+
+        validate() {
+          this.shadowRoot
+            .querySelectorAll("pretty-input")
+            .forEach(prettyInput => prettyInput.validate());
+        }
+
+        get valid() {
+          const prettyInputs = this.shadowRoot.querySelectorAll("pretty-input");
+          let isValid = true;
+          for (const input of prettyInputs) {
+            isValid = isValid && input.valid;
+          }
+          return isValid;
+        }
+      }
+
+      customElements.define('child-form', ChildForm);
+    </script>
+
+
+
+    {{ include.sh templates/header.html }}
+
+    <main>
+      <h1>Probe&shy;training</h1>
+      <section>
+        <article>
+          <h2>Anmeldung</h2>
+          <p>
+            Wir trainieren immer donnerstags. Informiere dich hier über
+            unsere <a href="verein#trainingszeiten">Trainingszeiten</a>. Nach
+            der Anmeldung lassen wir dir eine Bestätigung zukommen und dann
+            kannst du jederzeit vorbeikommen zum Training.
+          </p>
+          <form autocomplete="on">
+
+            <fieldset>
+              <legend>Wen möchtest du anmelden?</legend>
+              <label>
+                <input type="radio" name="above_18" value="yes"/>
+                <span>Mich selbst und ich bin über 18 Jahre alt.</span>
+              </label>
+              <label>
+                <input type="radio" name="above_18" value="underage" />
+                <span>Mich selbst und ich bin keine 18 Jahre alt.</span>
+              </label>
+              <label>
+                <input type="radio" name="above_18" value="no"  checked />
+                <span>Mein Kind / Meine Kinder.</span>
+              </label>
+            </fieldset>
+
+            <p id="disclaimer_underage" show-target="above_18" show-if="underage">
+              Wenn du noch nicht volljährig bist, lass bitte deine Eltern die
+              Anmeldung machen, da wir auch deren Einverständnis benötigen.
+            </p>
+
+            <div id="data_children" show-target="above_18" show-if="no">
+              <child-form no-delete></child-form>
+              <button type="button" class="plain" onclick="addChild()">
+                Ein Geschwisterkind hinzufügen
+              </button>
+            </div>
+
+            <!-- Deine Daten -->
+            <fieldset  id="data_adult" show-target="above_18" show-if-not="underage">
+              <legend>Deine Daten</legend>
+              <pretty-input
+                name="first_name"
+                required
+                autocomplete="on">
+                <span slot="label">Vorname</span>
+              </pretty-input>
+              <!-- <label> -->
+              <!--   <span>Vorname</span> -->
+              <!--   <input type="text" id="first_name" name="first_name" required autocomplete="on" /> -->
+              <!-- </label> -->
+
+              <!-- <label> -->
+              <!--   <span>Nachname</span> -->
+              <!--   <input type="text" id="last_name" name="last_name" required autocomplete="on" /> -->
+                <!-- </label> -->
+              <pretty-input
+                name="last_name"
+                required
+                autocomplete="on">
+                <span slot="label">Nachname</span>
+              </pretty-input>
+
+              <!-- <label> -->
+              <!--   <span>E-Mail</span> -->
+              <!--   <input type="email" id="email" name="email" required autocomplete="on" /> -->
+              <!--   </label> -->
+
+              <pretty-input
+                name="email"
+                type="email"
+                required
+                autocomplete="on">
+                <span slot="label">Email</span>
+              </pretty-input>
+
+              <pretty-input
+                name="phone"
+                type="tel"
+                required
+                autocomplete="on">
+                <span class="tooltip" slot="label">
+                  Telefon
+                  <span class="tooltip-text">nur für Notfälle während des Trainings</span>
+                </span>
+              </pretty-input>
+
+              <pretty-input
+                type="number"
+                name="age"
+                min="18"
+                max="99"
+                required
+                show-target="above_18"
+                show-if="yes">
+                <span slot="label">Alter</span>
+                <span slot="suffix">Jahre</span>
+              </pretty-input>
+
+            </fieldset>
+            <!-- Deine Daten end -->
+
+            <fieldset id="parents_consent_group" show-target="above_18" show-if="no" class="borderless">
+              <legend>Einverständniserklärung</legend>
+
+              <pretty-input
+                type="checkbox"
+                name="parents_consent"
+                required>
+                <span slot="label">
+                  <!-- TODO(sven): Remove leading rendered whitespace -->
+                  Hiermit gebe ich mein Einverständnis, dass mein Kind am
+                  Probetraining teilnimmt und mir ist bewusst, dass eine
+                  Kampfkunst zu Sportverletzungen führen kann und der Verein
+                  nicht für etwaige Unfälle haftet.
+                </span>
+              </pretty-input>
+            </fieldset>
+
+            <fieldset class="borderless" show-target="above_18" show-if-not="underage">
+              <legend>Datenschutzerklärung</legend>
+              <p>
+                <pretty-input
+                  type="checkbox"
+                  name="privacy"
+                  required>
+                  <span slot="label">
+                    Ich stimme der <a href="/datenschutz">Datenschutzerklärung</a> zu.
+                  </span>
+                </pretty-input>
+              </p>
+            </fieldset>
+
+            <p show-target="above_18" show-if-not="underage">
+              Die Anmeldung kommt uns per Email zu und wir melden uns so schnell
+              wie möglich bei dir!
+            </p>
+
+            <button show-target="above_18" show-if-not="underage">Anmelden</button>
+          </form>
+        </article>
+      </section>
+    </main>
+
+    <script type="text/javascript">
+
+
+
+      const childrenPlaceholder = document.getElementById('data_children');
+      const addButton = childrenPlaceholder.querySelector('button');
+
+
+      const form = document.querySelector('form');
+
+      function applyShowTargets() {
+        const controlledFields = form.querySelectorAll('[show-target]');
+        for (const controlledField of controlledFields) {
+          const showTarget = controlledField.getAttribute('show-target');
+          const checkedTarget = form.querySelector(`[name="${showTarget}"]:checked`);
+
+          if (checkedTarget !== null) {
+            const targetValue = checkedTarget.value;
+
+            const showIfValue = controlledField.getAttribute('show-if');
+            if (showIfValue !== null) {
+              if (targetValue === showIfValue) {
+                controlledField.removeAttribute('hidden');
+                controlledField.disabled = false;
+              } else {
+                controlledField.setAttribute('hidden', '');
+                controlledField.disabled = true;
+              }
+            }
+
+            const showIfNotValue = controlledField.getAttribute('show-if-not');
+            if (showIfNotValue !== null) {
+              if (targetValue !== showIfNotValue) {
+                controlledField.removeAttribute('hidden');
+                controlledField.disabled = false;
+              } else {
+                controlledField.setAttribute('hidden', '');
+                controlledField.disabled = true;
+              }
+            }
+          } else {
+            const showIfValue = controlledField.getAttribute('show-if');
+            if (showIfValue !== null) {
+              controlledField.setAttribute('hidden', '');
+              controlledField.disabled = true;
+            }
+
+            const showIfNotValue = controlledField.getAttribute('show-if-not');
+            if (showIfNotValue !== null) {
+              controlledField.setAttribute('hidden', '');
+              controlledField.disabled = true;
+            }
+          }
+        }
+      }
+
+      function addChild() {
+        addButton.before(document.createElement('child-form'));
+        applyShowTargets();
+      }
+
+      function checkForm(event) {
+        s// TODO(sven): Ignore display=None form elements
+        const form = event.target;
+        const prettyInputs = form.querySelectorAll("pretty-input, child-form");
+
+        let isValid = true;
+        for (let input of prettyInputs) {
+          input.validate();
+          isValid = isValid && input.valid;
+        }
+
+        if (!isValid) {
+          event.preventDefault();
+          return false;
+        }
+      }
+
+      form.onchange = applyShowTargets;
+      form.onsubmit = checkForm; // TODO(sven): Submit email
+      applyShowTargets();
+    </script>
+
+    {{ include.sh templates/footer.html }}
+  </body>
+</html>

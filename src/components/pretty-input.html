@@ -1,0 +1,254 @@
+<template id="pretty-input-template">
+  <style>
+    @import url("/stylesheets/theme.css");
+    @import url("/stylesheets/form.css");
+
+    div {
+        display: flex;
+        flex-direction: column;
+    }
+    div.has-errors .input-group {
+        background-color: var(--color-background-red);
+    }
+    div.has-errors .input-field {
+        border-bottom: 2px solid var(--color-red);
+    }
+    div.has-errors label {
+        color: var(--color-red);
+    }
+
+    .input-group {
+        background: var(--color-emphasis-background);
+    }
+
+    label {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.4rem 0 0.4rem;
+    }
+
+    label.required::after {
+        content: "*";
+        margin-left: -0.1rem;
+    }
+
+    .input-field {
+        display: flex;
+        padding: 0.4rem;
+        padding-top: 0.2rem;
+        border-bottom: 2px solid var(--color-cyan);
+    }
+
+    .input-field .suffix {
+        font-size: 0.8rem;
+    }
+
+    input {
+        background: transparent;
+        font-size: 1rem;
+        border: 0;
+
+    }
+
+    input.has-suffix {
+        margin-right: 0.3rem;
+    }
+
+    .errors {
+        font-weight: bold;
+        font-size: 0.9em;
+        color: var(--color-red);
+    }
+
+    /* TODO(sven): Format checkboxes nicely */
+  </style>
+
+  <div>
+    <span class="input-group">
+      <label>
+        <slot name="label"></slot>
+      </label>
+      <span class="input-field">
+        <input type="text"></input>
+        <span class="suffix">
+          <slot name="suffix"></slot>
+        </span>
+      </span>
+    </span>
+    <span class="errors">
+      <slot name="error-required"><span>Dieses Feld wird benötigt.</span></slot>
+      <slot name="error-min"><span>Der Wert muss mindestens {value} sein.</span></slot>
+      <slot name="error-max"><span>Der Wert darf maximal {value} sein.</span></slot>
+      <slot name="error-email"><span>Bitte gebe eine valide Email Adresse an.</span></slot>
+      <slot name="error-pattern"><span>Die Eingabe ist nicht valide.</span></slot>
+    </span>
+  </div>
+</template>
+
+<script type="module">
+  import { loadTemplate } from '/javascripts/lib/template.js';
+
+  class PrettyInput extends HTMLElement {
+    constructor() {
+      super();
+
+      const shadowRoot = this.attachShadow({ mode: 'open' });
+      shadowRoot.appendChild(loadTemplate('pretty-input-template'));
+
+      const isRequired = this.getAttribute("required") !== null;
+      if (isRequired) {
+        shadowRoot.querySelector("label").classList.add("required");
+      }
+
+      const input = shadowRoot.querySelector("input");
+
+      const setAttributeIfProvided = (attribute) => {
+        const value = this.getAttribute(attribute);
+        if (value != null) {
+          input.setAttribute(attribute, value);
+        }
+      }
+
+      setAttributeIfProvided("name");
+      setAttributeIfProvided("type");
+      setAttributeIfProvided("required");
+      setAttributeIfProvided("autocomplete");
+      setAttributeIfProvided("min");
+      setAttributeIfProvided("max");
+      setAttributeIfProvided("pattern");
+
+      if (input.getAttribute("type") == "tel") {
+        // TODO(sven): Use a default pattern to detect valid phone numbers.
+      } else if (input.getAttribute("type") == "checkbox") {
+        // NOTE(sven): For checkboxes, we want the label to appear right of the
+        // checkbox item, so we swap the label slot with the input-field tag.
+        this.shadowRoot.querySelector(".input-group").appendChild(
+          this.shadowRoot.querySelector("label")
+        );
+      }
+
+      const suffixSlot = shadowRoot.querySelector("slot[name='suffix']");
+      const suffixElements = suffixSlot.assignedElements();
+      if (suffixElements.length > 1) {
+        throw new Error("Only expected a single assigned element for slot 'suffix'");
+      } else if (suffixElements.length == 1) {
+        input.classList.add("has-suffix");
+      }
+
+      const errors = shadowRoot.querySelector(".errors");
+      for (const slot of errors.children) {
+        const errorElements = slot.assignedElements();
+        if (errorElements.length > 1) {
+          throw new Error(`Only expected a single assigned element for slot '{slot.name}'`);
+        } else if (errorElements.length == 1) {
+          const errorElement = errorElements[0];
+          errorElement.style.display = 'none';
+          if (slot.name == "error-min") {
+            errorElement.innerText = this.parseValue(errorElement.innerText, input.min)
+          } else if (slot.name == "error-max") {
+            errorElement.innerText = this.parseValue(errorElement.innerText, input.max)
+          }
+        } else {
+          // NOTE(sven): Hide the default value.
+          slot.children[0].style.display = 'none';
+
+          if (slot.name == "error-min") {
+            slot.children[0].innerText = this.parseValue(slot.children[0].innerText, input.min)
+          } else if (slot.name == "error-max") {
+            slot.children[0].innerText = this.parseValue(slot.children[0].innerText, input.max)
+          }
+        }
+      }
+      this.activeErrors = new Set();
+
+      input.onchange = this.validate.bind(this);
+      this.input = input;
+    }
+
+    parseValue(formatString, value) {
+      return formatString.replaceAll("{value}", value);
+    }
+
+    queryErrorSlot(errorType) {
+      return this.shadowRoot.querySelector(`.errors [name='error-${errorType}']`);
+    }
+
+    queryError(errorType) {
+      const slot = this.queryErrorSlot(errorType);
+      const errorElements = slot.assignedElements();
+      if (errorElements.length == 1) {
+        return errorElements[0];
+      } else {
+        // NOTE(sven): When no explicit slot is assigned, the default value has
+        // to be accessed via 'children'.
+        return slot.children[0];
+      }
+    }
+
+    _assertErrorTypeExists(errorType) {
+      const error = this.queryErrorSlot(errorType);
+      if (!error) {
+        throw new Error(`The error type ${errorType} is not defined for pretty-input tags.`);
+      }
+    }
+
+    setError(errorType) {
+      this._assertErrorTypeExists(errorType);
+      const error = this.queryError(errorType);
+      error.style.removeProperty("display");
+
+      this.shadowRoot.querySelector("div").classList.add("has-errors");
+      this.activeErrors.add(errorType);
+    }
+
+    unsetError(errorType) {
+      this._assertErrorTypeExists(errorType);
+      const error = this.queryError(errorType);
+      error.style.display = 'none';
+
+      this.activeErrors.delete(errorType);
+      if (this.activeErrors.size == 0) {
+        this.shadowRoot.querySelector("div").classList.remove("has-errors");
+      }
+    }
+
+    validate(event) {
+      if (this.input.validity.valueMissing) {
+        this.setError("required")
+      } else {
+        this.unsetError("required")
+
+        if (this.input.type == "number") {
+          if (this.input.validity.rangeUnderflow) {
+            this.setError("min");
+          } else {
+            this.unsetError("min");
+          }
+
+          if (this.input.validity.rangeOverflow) {
+            this.setError("max");
+          } else {
+            this.unsetError("max");
+          }
+        } else if (this.input.type == "email") {
+          if (!this.input.validity.valid) {
+            this.setError("email");
+          } else {
+            this.unsetError("email");
+          }
+        } else if (this.input.pattern) {
+          if (!this.input.validity.valid) {
+            this.setError("pattern");
+          } else {
+            this.unsetError("pattern");
+          }
+        }
+      }
+    }
+
+    get valid() {
+      return this.input.validity.valid;
+    }
+  }
+
+  customElements.define('pretty-input', PrettyInput);
+</script>
