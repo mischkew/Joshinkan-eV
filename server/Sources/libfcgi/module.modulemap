@@ -1,0 +1,5 @@
+module libfcgi [system] {
+    umbrella header "fcgi.h"
+    link "fcgi"
+    export *
+}

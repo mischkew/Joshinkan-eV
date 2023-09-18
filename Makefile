@@ -1,4 +1,4 @@
-.PHONY: all assets build sed start stop reload logs-error logs-access
+.PHONY: all assets build sed start stop reload logs-error logs-access server server-deps start-server stop-server
 all: build
 
 # GNU sed is required for shell substitution. Use brew to install it on OSX if
@@ -15,35 +15,79 @@ ifeq (,$(GSED_PATH))
 endif
 endif
 
-build: assets $(subst src,build,$(wildcard src/*.html))
+# NOTE(sven): Install fcgi and spawn-fcgi to support the nginx connection to the
+# backend.
+server-deps:
+ifeq ($(SYSTEM_NAME), Darwin)
+	@if [ ! -d $$(brew --prefix fcgi) ]; then \
+    brew install fcgi; \
+	fi
+	@if [ ! -d $$(brew --prefix spawn-fcgi) ]; then \
+    brew install spawn-fcgi; \
+	fi
+else
+  echo "Deps only installed for OSX" && exit 1
+endif
+
+build: assets $(subst web,build/web,$(wildcard web/*.html)) build/server/server
 
 assets:
-	mkdir -p build
-	cp -r src/images src/stylesheets src/javascripts src/fonts build/
+	mkdir -p build/web
+	cp -r web/images web/stylesheets web/javascripts web/fonts build/web
 
+SWIFT_FILES = $(shell find server -type f -not -path "*.build*" "(" -name "*.swift" -or -name "*.modulemap" -or -name "*.h" ")")
+build/server/server: $(SWIFT_FILES)
+	echo $^
+	$(MAKE) server-deps
+	mkdir -p build/server
+	swift build --package-path server
+	cp $$(swift build --package-path server --show-bin-path)/server ./build/server/server
 
 clean:
 	rm -rf ./build
 
 watch:
-	while true; do $(MAKE) --silent; sleep 1; done
+	while true; do \
+		$(MAKE) build/server/server --question || \
+			$(MAKE) start-server --silent || \
+			$(MAKE) start-server --touch; \
+		$(MAKE) build --silent; \
+		$(MAKE) reload --silent; \
+		sleep 1; \
+	done
 
 
-build/%.html: src/%.html $(wildcard src/templates/*.html) | sed
+build/web/%.html: web/%.html $(wildcard web/templates/*.html) $(wildcard web/components/*.html) | sed
 	@echo "Building $< to $@"
 	@mkdir -p $$(dirname $@)
-	./src/scripts/include.sh $< > $@ || (rm $@ && exit 1)
+	./web/scripts/include.sh $< > $@ || (rm $@ && exit 1)
 
+start-server: build/server/server
+	$(MAKE) stop-server
+	spawn-fcgi \
+    -d build/server \
+    -p 5000 \
+    -P fcgi.pid \
+    -- server
 
-start: build
+stop-server:
+	@if [ -f fcgi.pid ] && [ -n "$$(cat fcgi.pid)" ] ; then \
+		(kill $$(cat fcgi.pid) || echo "no such process") && \
+		rm fcgi.pid && \
+		echo "server stopped"; \
+	else \
+		echo "server not running"; \
+	fi
+
+start: build start-server
 	mkdir -p logs
 	nginx -p ./ -c nginx.conf
 
-stop:
-	nginx -s stop
+stop: stop-server
+	@(nginx -s stop >& /dev/null && echo "nginx stopped") || echo "nginx not running"
 
-reload: build
-	nginx -s reload
+reload: nginx.conf
+	nginx -s reload -p ./ -c nginx.conf
 
 logs-error:
 	tail -f logs/error.log
