@@ -2,3 +2,4 @@ build
 logs
 *.pid
 .env
+server/.swiftpm
