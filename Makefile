@@ -130,7 +130,7 @@ build-backend: build/server/server
 start-backend: build/server/server
 ifndef SMTP_EMAIL
 $(error Variable SMTP_EMAIL is not set. Check .env or define environment variable)
-mendif
+endif
 ifndef SMTP_PASSWORD
 $(error Variable SMTP_PASSWORD is not set. Check .env or define environment variable)
 endif
