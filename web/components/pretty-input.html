@@ -271,7 +271,13 @@
           }
         }
       }
-    }
+  }
+
+  appendFormData(formData) {
+    let name = this.input.name;
+    let value = this.input.value;
+    formData.append(name, value);
+  }
 
     get valid() {
       return this.input.validity.valid;

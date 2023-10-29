@@ -106,6 +106,12 @@
           this.remove();
         }
 
+        appendFormData(formData) {
+          this.shadowRoot
+            .querySelectorAll("pretty-input")
+            .forEach(prettyInput => formData.append(prettyInput.input.name, prettyInput.input.value))
+        }
+
         attributeChangedCallback(name, oldValue, newValue) {
           if (name === "no-delete") {
             if (newValue !== null) {
@@ -201,7 +207,7 @@
                   <span class="tooltip-text">nur für Notfälle während des Trainings</span>
                 </span>
                 <span slot="error-pattern">
-                  Eine Telefonnummer darf nur aus Ziffern von 0-9 bestehen.
+                  Eine Telefonnummer darf nur aus Ziffern von 0-9 und einem führenden + bestehen.
                 </span>
               </pretty-input>
 
@@ -388,13 +394,7 @@
         // see: https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
         let formData = new FormData();
         for (let input of prettyInputs) {
-          let name = input.input.name;
-          let value = input.input.value;
-          formData.append(name, value);
-        }
-
-        async function handleError() {
-
+            input.appendFormData(formData)
         }
 
         try {
