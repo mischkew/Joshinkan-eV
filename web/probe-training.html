@@ -8,6 +8,12 @@
       #data_adult {
           gap: 1rem;
       }
+
+      #form-backend-error {
+          font-weight: bold;
+          font-size: 0.9em;
+          color: var(--color-red);
+      }
     </style>
   </head>
 
@@ -26,22 +32,22 @@
       </style>
       <fieldset show-target="above_18" show-if="no" class="borderless">
         <legend>Daten deines Kindes</legend>
-        <button type="button" class="plain" onclick="this.parentNode.remove()">
-          Entfernen
+        <button type="button" class="plain">
+          Geschwisterkind entfernen
         </button>
         <pretty-input
-          name="child_first_name[]"
+          name="child_first_name"
           required>
           <span slot="label">Vorname</span>
         </pretty-input>
         <pretty-input
-          name="child_last_name[]"
+          name="child_last_name"
           required>
           <span slot="label">Nachname</span>
         </pretty-input>
 
         <pretty-input
-          name="child_age[]"
+          name="child_age"
           min="8"
           max="17"
           type="number"
@@ -56,15 +62,12 @@
       import { loadTemplate } from '/javascripts/lib/template.js';
 
       class ChildForm extends HTMLElement {
+        static get observedAttributes() { return ['no-delete']; }
+
         constructor() {
           super();
-
-          const withoutDeleteButton = this.getAttribute("no-delete");
           const fieldset = loadTemplate('fieldset_child');
-
-          if (withoutDeleteButton !== null) {
-            fieldset.querySelector("button").style.display = 'none';
-          }
+          fieldset.querySelector('button').onclick = this.removeFromParent.bind(this);
 
           const shadowRoot = this.attachShadow({ mode: 'open' });
           shadowRoot.appendChild(fieldset);
@@ -84,6 +87,35 @@
           }
           return isValid;
         }
+
+        setChildNumber(number) {
+          if (number === null) {
+            this.shadowRoot.querySelector("legend").innerText = "Daten deines Kindes";
+          } else {
+            this.shadowRoot.querySelector("legend").innerText = `Daten deines Kindes #${number}`;
+          }
+        }
+
+        removeFromParent() {
+          const removeEvent = new Event("removeChild", {
+            bubbles: true,
+            composed: true,
+            cancelable: false
+          });
+          this.dispatchEvent(removeEvent);
+          this.remove();
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          if (name === "no-delete") {
+            if (newValue !== null) {
+              this.shadowRoot.querySelector("button").style.display = 'none';
+            } else {
+              this.shadowRoot.querySelector("button").style.removeProperty('display');
+            }
+          }
+        }
+
       }
 
       customElements.define('child-form', ChildForm);
@@ -143,26 +175,13 @@
                 autocomplete="on">
                 <span slot="label">Vorname</span>
               </pretty-input>
-              <!-- <label> -->
-              <!--   <span>Vorname</span> -->
-              <!--   <input type="text" id="first_name" name="first_name" required autocomplete="on" /> -->
-              <!-- </label> -->
 
-              <!-- <label> -->
-              <!--   <span>Nachname</span> -->
-              <!--   <input type="text" id="last_name" name="last_name" required autocomplete="on" /> -->
-                <!-- </label> -->
               <pretty-input
                 name="last_name"
                 required
                 autocomplete="on">
                 <span slot="label">Nachname</span>
               </pretty-input>
-
-              <!-- <label> -->
-              <!--   <span>E-Mail</span> -->
-              <!--   <input type="email" id="email" name="email" required autocomplete="on" /> -->
-              <!--   </label> -->
 
               <pretty-input
                 name="email"
@@ -180,6 +199,9 @@
                 <span class="tooltip" slot="label">
                   Telefon
                   <span class="tooltip-text">nur für Notfälle während des Trainings</span>
+                </span>
+                <span slot="error-pattern">
+                  Eine Telefonnummer darf nur aus Ziffern von 0-9 bestehen.
                 </span>
               </pretty-input>
 
@@ -206,7 +228,6 @@
                 name="parents_consent"
                 required>
                 <span slot="label">
-                  <!-- TODO(sven): Remove leading rendered whitespace -->
                   Hiermit gebe ich mein Einverständnis, dass mein Kind am
                   Probetraining teilnimmt und mir ist bewusst, dass eine
                   Kampfkunst zu Sportverletzungen führen kann und der Verein
@@ -235,18 +256,16 @@
             </p>
 
             <button show-target="above_18" show-if-not="underage">Anmelden</button>
+
+            <p id="form-backend-error"><p>
           </form>
         </article>
       </section>
     </main>
 
     <script type="text/javascript">
-
-
-
       const childrenPlaceholder = document.getElementById('data_children');
       const addButton = childrenPlaceholder.querySelector('button');
-
 
       const form = document.querySelector('form');
 
@@ -297,29 +316,117 @@
       }
 
       function addChild() {
+        document.querySelector("child-form").removeAttribute("no-delete");
         addButton.before(document.createElement('child-form'));
         applyShowTargets();
       }
 
-      function checkForm(event) {
-        s// TODO(sven): Ignore display=None form elements
-        const form = event.target;
-        const prettyInputs = form.querySelectorAll("pretty-input, child-form");
+      form.addEventListener(
+        "removeChild",
+        (event) => {
+          // NOTE(sven): This event gets triggered before the child element is
+          // removed. We want to re-add the "no-delete" attribute on the
+          // remaining child form. As we don't know which form was deleted, we
+          // just add the attribute to bot forms.
+          const childForms = document.querySelectorAll("child-form");
+          if (childForms.length == 2) {
+            for (let cf of childForms) {
+              cf.setAttribute("no-delete", '');
+            }
+          }
+        }
+      );
 
+      async function submitForm(event) {
+        event.preventDefault();
+
+        // reset form errors
+        document.getElementById("form-backend-error").innerText = "";
+
+        const form = event.target;
+
+        // NOTE(sven): Some form elements might be hidden depending on whether
+        // children or adults are signing up.
+        const prettyInputs = form.querySelectorAll(
+          '& :not([hidden]) pretty-input,'
+            + '& :not([hidden]) child-form'
+        );
+
+        function disableFormInputs() {
+          form.querySelector("button").setAttribute('disabled', '');
+          prettyInputs.forEach((input) => {
+            input.setAttribute('disabled', '');
+          });
+        }
+
+        function enableFormInputs() {
+          form.querySelector("button").setAttribute('disabled', '');
+          prettyInputs.forEach((input) => {
+            input.removeAttribute('disabled');
+          });
+        }
+
+        // NOTE(sven): If multiple inputs are invalid, show all invalid inputs
+        // at once
         let isValid = true;
         for (let input of prettyInputs) {
+          if (input.hasAttribute('hidden')) {
+            continue;
+          }
+
           input.validate();
           isValid = isValid && input.valid;
         }
-
         if (!isValid) {
-          event.preventDefault();
+          enableFormInputs();
+          return false;
+        }
+
+        disableFormInputs();
+
+        // create form data here from inputs
+        // see: https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
+        let formData = new FormData();
+        for (let input of prettyInputs) {
+          let name = input.input.name;
+          let value = input.input.value;
+          formData.append(name, value);
+        }
+
+        async function handleError() {
+
+        }
+
+        try {
+          let response = await fetch('/api/trial-registration', { // TODO implement
+            method: 'POST',
+            body: formData
+          });
+
+          if (!response.ok) {
+            // NOTE(sven): This happens on server errors...
+            let errorElement = document.getElementById("form-backend-error")
+            try {
+              let json = await response.json();
+              errorElement.innerText = json.message;
+            } catch(error) {
+              console.log(error);
+              errorElement.innerText = "Serverseitiger Fehler. Versuche es später nochmal oder schreibe uns direkt eine Email.";
+            }
+            enableFormInputs();
+            return false;
+          }
+        } catch(error) {
+          // NOTE(sven): This happens on network errors...
+          console.log(error);
+          let errorElement = document.getElementById("form-backend-error");
+          errorElement.innerText = "Netzwerkfehler. Es besteht keine Internetverbindung zum Server. Versuche es später nochmal oder überprüfe deine Internetverbindung.";
           return false;
         }
       }
 
       form.onchange = applyShowTargets;
-      form.onsubmit = checkForm; // TODO(sven): Submit email
+      form.onsubmit = submitForm;
       applyShowTargets();
     </script>
 
