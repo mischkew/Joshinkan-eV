@@ -108,8 +108,10 @@
 
         appendFormData(formData) {
           this.shadowRoot
-            .querySelectorAll("pretty-input")
-            .forEach(prettyInput => formData.append(prettyInput.input.name, prettyInput.input.value))
+              .querySelectorAll("pretty-input")
+              .forEach(prettyInput => {
+                formData.append(prettyInput.input.name + "[]", prettyInput.input.value)
+              })
         }
 
         attributeChangedCallback(name, oldValue, newValue) {

@@ -1,0 +1,62 @@
+POST /api/trial-registration HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en,de-DE;q=0.9,de;q=0.8,en-US;q=0.7
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Length: 1046
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary8uvuEcsk7hsemph9
+DNT: 1
+Host: localhost:3000
+Origin: http://localhost:3000
+Pragma: no-cache
+Referer: http://localhost:3000/probe-training
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36
+sec-ch-ua: "Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "macOS"
+
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="child_first_name[]"
+
+Boi
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="child_last_name[]"
+
+Fam
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="child_age[]"
+
+17
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="first_name
+
+Dad
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="last_name"
+
+Fam
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="email"
+
+fam@mail.com
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="phone"
+
+04912847
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="age"
+
+
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="parents_consent"
+
+on
+------WebKitFormBoundary8uvuEcsk7hsemph9
+Content-Disposition: form-data; name="privacy"
+
+on
+------WebKitFormBoundary8uvuEcsk7hsemph9--
