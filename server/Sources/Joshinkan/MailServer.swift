@@ -1,6 +1,45 @@
 import ArgumentParser
 import Foundation
+
 import libfcgi
+
+let routeTrialRegistration = Route(path: URL(string: "/api/trial-registration")!) { server in
+  // TODO:
+  // - read json body
+  // - validate that all keys are present and contain the correct data type/ ranges
+  // - construct email template
+  // - send registration details to cc/bcc list + smtpUser
+  // - send separate acknowledgement email to registrating user
+  let mail = Mail(
+    from: server.smtpUser,
+    to: [User(name: "Sven", email: "sven.mkw@gmail.com")],    
+    replyTo: server.replyTo,
+    subject: "A test mail",
+    body: "A test body"
+  )
+
+  do {
+    try server.smtp.send(mail)
+  } catch is SmtpError {
+    return JSONResponse(status: .INTERNAL_SERVER_ERROR, json: ["error": "Failed to send email."])
+  } catch {
+    return JSONResponse(status: .INTERNAL_SERVER_ERROR, json: ["error": "Unknown error."])
+  }
+  
+  let json = ["message": "Email sent."]
+  return JSONResponse(status: .OK, json: json)
+}
+
+let routePrintEnv = Route(path: URL(string: "/api/env")!) { _ in
+  let keys = ProcessInfo.processInfo.environment.keys
+  var body = ""
+  for key in keys.sorted() {
+    let value = ProcessInfo.processInfo.environment[key]
+    body += "\(key): \(value ?? "NOT SET")<br/>\n"
+  }
+
+  return StringResponse(status: .OK, headers: ["Content-Type": "text/html"], body: body)
+}
 
 @main
 struct MailServer: ParsableCommand {
@@ -48,51 +87,39 @@ struct MailServer: ParsableCommand {
   )
   var bcc: [User] = []
   
+  @Option(
+    name: .customLong("reply-to"),
+    help: """
+    Reply to this address when the user presses the "Reply" button in their email
+    client. Can either be email only or a combination of name and email, i.e.
+    'smith@example.com' or 'John Smith <smith@example.com>'.
+    """,
+    transform: User.init
+  )
+  var replyTo: User? = nil
+  
+  lazy var smtp: SMTP = .init(
+    email: smtpUser.email,
+    password: smtpPassword,
+    hostname: smtpHostname
+  )
+  
+  lazy var ROUTES: [Route] = {
+    var routes = [
+      routeTrialRegistration
+    ]
+    
+#if DEBUG
+    routes += [
+      routePrintEnv
+    ]
+#endif
+    return routes
+  }()
+  
   mutating func run() {
-    var count = 0
-    
-    while FCGI_Accept() >= 0 {
-      count += 1
-      
-      // headers
-      libfcgi.FCGI_puts("Content-type: text/html\r\n")
-      libfcgi.FCGI_puts("\r\n")
-      
-//      libfcgi.FCGI_puts("Hello world!<br>\r\n")
-//      let keys = ProcessInfo.processInfo.environment.keys.joined(separator: " ")
-//      libfcgi.FCGI_puts("\(keys)\n")
-//
-//      let scriptName = ProcessInfo.processInfo.environment["SCRIPT_NAME"]!
-//      libfcgi.FCGI_puts("\(scriptName)\n")
-//      libfcgi.FCGI_puts("Request number \(count)")
-      
-      // email
-      let mail = Mail(
-        from: smtpUser,
-        to: [User(name: "Other Me", email: "sven.mkw@gmail.com")],
-        cc: cc,
-        bcc: bcc,
-        subject: "Hello world - \(count)",
-        body: "Some body text --- count: \(count)"
-      )
-      let smtp = SMTP(
-        email: smtpUser.email,
-        password: smtpPassword,
-        hostname: smtpHostname
-      )
-      guard (try? smtp.send(mail)) != nil else {
-        FCGI_puts("Failed to send email at usage count \(count)")
-        return
-      }
-      
-      FCGI_puts("Email sent at usage conut \(count)")
+    loopAcceptAndDo {
+      matchAndExecuteRoutes(routes: self.ROUTES, server: &self)
     }
-    
-    // TODO:
-    // - read form encoded body
-    // - send email
-    // - return success/ error json
-    // - do this inside fcgi loop
-    // - in frontend: catch submission, on success forward to "registered" page
   }
 }

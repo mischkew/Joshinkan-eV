@@ -60,6 +60,7 @@ struct Mail {
   let to: [User]
   var cc: [User] = []
   var bcc: [User] = []
+  var replyTo: User? = nil
   var subject: String = ""
   let body: String
 
@@ -73,7 +74,7 @@ struct Mail {
     To: \(to.map { $0.description }.joined(separator: ", "))
     From: \(from)
     Subject: \(subject)
-    Reply-To: \(from)
+    Reply-To: \(replyTo ?? from)
 
     \(body)
     """
@@ -88,6 +89,7 @@ func list2curl(_ list: [String]) -> UnsafeMutablePointer<curl_slist> {
   }
   return curlList!
 }
+
 
 struct UserData {
   var payload: String
@@ -144,8 +146,10 @@ struct UserData {
   }
 }
 
+
 enum SmtpError: Error {
   case curlInitFailed
+  case curlFailed(String)
 }
 
 struct SMTP {
@@ -158,7 +162,7 @@ struct SMTP {
       // TODO(sven): throw a runtime error or something
       throw SmtpError.curlInitFailed
     }
-
+    
     curl_easy_setopt_string(curl, CURLOPT_URL, hostname)
     curl_easy_setopt_string(curl, CURLOPT_USERNAME, email)
     curl_easy_setopt_string(curl, CURLOPT_PASSWORD, password)
@@ -186,9 +190,9 @@ struct SMTP {
     if result != CURLE_OK {
       if let error = curl_easy_strerror(result) {
         let errorStr = String(cString: error)
-        print("Mail sending failed: \(errorStr)")
+        throw SmtpError.curlFailed(errorStr)
       } else {
-        print("Mail sending failed: Unknown Error")
+        throw SmtpError.curlFailed("Unknown Error")
       }
     }
 
