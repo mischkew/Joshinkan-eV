@@ -4,62 +4,71 @@
     @import url("/stylesheets/form.css");
 
     div {
-        display: flex;
-        flex-direction: column;
+      display: flex;
+      flex-direction: column;
     }
     div.has-errors .input-group {
-        background-color: var(--color-background-red);
+      background-color: var(--color-background-red);
     }
     div.has-errors .input-field {
-        border-bottom: 2px solid var(--color-red);
+      border-bottom: 2px solid var(--color-red);
     }
     div.has-errors label {
-        color: var(--color-red);
+      color: var(--color-red);
     }
 
     .input-group {
-        background: var(--color-emphasis-background);
+      background: var(--color-emphasis-background);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group.type-checkbox {
+      flex-direction: row;
+
+    }
+
+    .input-group.type-checkbox .input-field {
+      padding-top: 0.4rem;
     }
 
     label {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.4rem 0 0.4rem;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.4rem 0 0.4rem;
     }
 
     label.required::after {
-        content: "*";
-        margin-left: -0.1rem;
+      content: "*";
+      margin-left: -0.1rem;
     }
 
     .input-field {
-        display: flex;
-        padding: 0.4rem;
-        padding-top: 0.2rem;
-        border-bottom: 2px solid var(--color-cyan);
+      display: flex;
+      padding: 0.4rem;
+      padding-top: 0.2rem;
+      border-bottom: 2px solid var(--color-cyan);
     }
 
     .input-field .suffix {
-        font-size: 0.8rem;
+      font-size: 0.8rem;
     }
 
     input {
-        background: transparent;
-        font-size: 1rem;
-        border: 0;
+      background: transparent;
+      font-size: 1rem;
+      border: 0;
 
     }
 
     input.has-suffix {
-        margin-right: 0.3rem;
+      margin-right: 0.3rem;
     }
 
     .errors {
-        font-weight: bold;
-        font-size: 0.9em;
-        color: var(--color-red);
+      font-weight: bold;
+      font-size: 0.9em;
+      color: var(--color-red);
     }
-
-    /* TODO(sven): Format checkboxes nicely */
   </style>
 
   <div>
@@ -88,6 +97,16 @@
   import { loadTemplate } from '/javascripts/lib/template.js';
 
   class PrettyInput extends HTMLElement {
+    static get observedAttributes() { return ['disabled']; }
+
+    setAttributeIfProvided(attribute) {
+      const value = this.getAttribute(attribute);
+      if (value != null) {
+        const input = this.shadowRoot.querySelector("input");
+        input.setAttribute(attribute, value);
+      }
+    }
+
     constructor() {
       super();
 
@@ -101,23 +120,21 @@
 
       const input = shadowRoot.querySelector("input");
 
-      const setAttributeIfProvided = (attribute) => {
-        const value = this.getAttribute(attribute);
-        if (value != null) {
-          input.setAttribute(attribute, value);
-        }
-      }
+      this.setAttributeIfProvided("name");
+      this.setAttributeIfProvided("type");
+      this.setAttributeIfProvided("required");
+      this.setAttributeIfProvided("autocomplete");
+      this.setAttributeIfProvided("min");
+      this.setAttributeIfProvided("max");
+      this.setAttributeIfProvided("pattern");
+      this.setAttributeIfProvided("disabled");
 
-      setAttributeIfProvided("name");
-      setAttributeIfProvided("type");
-      setAttributeIfProvided("required");
-      setAttributeIfProvided("autocomplete");
-      setAttributeIfProvided("min");
-      setAttributeIfProvided("max");
-      setAttributeIfProvided("pattern");
+      this.shadowRoot.querySelector('.input-group').classList.add(`type-${input.type}`);
 
       if (input.getAttribute("type") == "tel") {
-        // TODO(sven): Use a default pattern to detect valid phone numbers.
+        if (!input.hasAttribute("pattern")) {
+          input.setAttribute("pattern", '\\+?\\d+');
+        }
       } else if (input.getAttribute("type") == "checkbox") {
         // NOTE(sven): For checkboxes, we want the label to appear right of the
         // checkbox item, so we swap the label slot with the input-field tag.
@@ -162,6 +179,14 @@
 
       input.onchange = this.validate.bind(this);
       this.input = input;
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (newValue !== null) {
+        this.setAttributeIfProvided(name, newValue);
+      } else {
+        this.input.removeAttribute(name);
+      }
     }
 
     parseValue(formatString, value) {

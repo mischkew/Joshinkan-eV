@@ -116,7 +116,6 @@ a[href^='#'] {
   text-decoration: none;
 }
 a:hover,
-button:not([disabled]):hover,
 summary:hover {
   filter: brightness(108%);
   color: var(--color-emphasis);
@@ -210,6 +209,10 @@ button {
   font-size: 85%;
   letter-spacing: 0.1em;
 }
+button:hover {
+  filter: brightness(108%);
+}
+
 button[disabled] {
   color: var(--color-dark);
   border-color: var(--color-medium);
