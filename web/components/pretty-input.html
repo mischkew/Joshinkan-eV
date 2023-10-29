@@ -177,7 +177,10 @@
       }
       this.activeErrors = new Set();
 
-      input.onchange = this.validate.bind(this);
+      input.onchange = (event) => {
+        input.value = input.value.trim();
+        this.validate(event);
+      };
       this.input = input;
     }
 
