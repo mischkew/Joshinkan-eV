@@ -141,7 +141,10 @@ endif
     -d build/server \
     -p 5000 \
     -P fcgi.pid \
-    -- server --email $(SMTP_EMAIL) --password $(SMTP_PASSWORD)
+    -- server \
+      --email $(SMTP_EMAIL) \
+      --password $(SMTP_PASSWORD) \
+      --reply-to "sven.mkw+reply@gmail.com"
 
 .PHONY: stop-backend
 stop-backend:
@@ -176,9 +179,16 @@ else
   echo "Deps only installed for OSX" && exit 1
 endif
 
-SWIFT_FILES = $(shell find server -type f -not -path "*.build*" "(" -name "*.swift" -or -name "*.modulemap" -or -name "*.h" ")")
+SWIFT_FILES_CMD = find server -type f -not -path "*.build*" "(" -name "*.swift" -or -name "*.modulemap" -or -name "*.h" -or -name "*Package.resolved" ")"
+SWIFT_FILES = $(shell $(SWIFT_FILES_CMD))
+.PHONY: debug-build-dependencies
+debug-build-dependencies:
+	$(SWIFT_FILES_CMD)
+	@echo
+	@echo $(SWIFT_FILES)
+
 build/server/server: $(SWIFT_FILES)
-	echo $^
+	@echo $^
 	$(MAKE) backend-dependencies
 	mkdir -p build/server
 	swift build --package-path server
