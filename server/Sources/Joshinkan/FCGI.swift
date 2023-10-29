@@ -8,8 +8,6 @@
 import Foundation
 import libfcgi
 
-struct FormData {}
-
 enum HTTPStatus: Int {
   case OK = 200
   case BAD_REQUEST = 400
@@ -100,7 +98,12 @@ func readBody(_ file: FileHandle = FileHandle.standardInput) -> String? {
   return body
 }
 
-func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: String]? {
+enum FormValue: Equatable {
+  case plain(_ string: String)
+  case list(_ list: [String])
+}
+
+func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: FormValue]? {
   guard let contentLength = contentLength() else { return nil }
   guard let contentType = env("CONTENT_TYPE") else { return nil }
 
@@ -112,7 +115,7 @@ func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: Str
   let components = body.components(separatedBy: "--" + boundary)
   guard components[components.endIndex-1] == "--\n" else { return nil }
 
-  var formData: [String:String] = [:]
+  var formData: [String:FormValue] = [:]
   
   // NOTE(sven): Skip the first component which is always empty and skip the last
   // component which are double hyphens.
@@ -144,7 +147,18 @@ func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: Str
     let componentName = statementParts[1].trimmingCharacters(in: CharacterSet(charactersIn: "\""))
     let componentBody = componentParts[1].trimmingCharacters(in: .whitespacesAndNewlines)
     
-    formData[componentName] = componentBody
+    if componentName.hasSuffix("[]") {
+      let endIndex = componentName.index(componentName.endIndex, offsetBy: -3)
+      let prefix = String(componentName[...endIndex])
+      if case .list(var values) = formData[prefix] {
+        values.append(componentBody)
+        formData[prefix] = .list(values)
+      } else {
+        formData[prefix] = .list([componentBody])
+      }
+    } else {
+      formData[componentName] = .plain(componentBody)
+    }
   }
   
   return formData

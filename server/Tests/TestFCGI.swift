@@ -85,19 +85,55 @@ final class FCGITests: XCTestCase {
     XCTAssertEqual(body?.suffix(46), "on\n------WebKitFormBoundaryiB5iskbmcAfH1zPo--\n")
   }
   
-  func test_readFormData() {
+  func test_readFormData_adult() {
     guard let file = readRequest(fromResource: "adult-registration", withExtension: "request") else {
       XCTFail("Failed to read request")
       return
     }
     
     let formData = readFormData(file)
-    XCTAssertEqual(formData?["first_name"], "sven")
-    XCTAssertEqual(formData?["last_name"], "mkw")
-    XCTAssertEqual(formData?["email"], "sven.mkw@gmail.com")
-    XCTAssertEqual(formData?["phone"], "123456789")
-    XCTAssertEqual(formData?["age"], "23")
-    XCTAssertEqual(formData?["privacy"], "on")
+    XCTAssertEqual(formData?["first_name"], .plain("sven"))
+    XCTAssertEqual(formData?["last_name"], .plain("mkw"))
+    XCTAssertEqual(formData?["email"], .plain("sven.mkw@gmail.com"))
+    XCTAssertEqual(formData?["phone"], .plain("123456789"))
+    XCTAssertEqual(formData?["age"], .plain("23"))
+    XCTAssertEqual(formData?["privacy"], .plain("on"))
+  }
+  
+  func test_readFormData_child() {
+    guard let file = readRequest(fromResource: "child-registration", withExtension: "request") else {
+      XCTFail("Failed to read request")
+      return
+    }
+    
+    let formData = readFormData(file)
+    XCTAssertEqual(formData?["child_first_name"], .list(["Boi"]))
+    XCTAssertEqual(formData?["child_last_name"], .list(["Fam"]))
+    XCTAssertEqual(formData?["child_age"], .list(["17"]))
+    XCTAssertEqual(formData?["first_name"], .plain("Dad"))
+    XCTAssertEqual(formData?["last_name"], .plain("Fam"))
+    XCTAssertEqual(formData?["email"], .plain("fam@mail.com"))
+    XCTAssertEqual(formData?["phone"], .plain("04912847"))
+    XCTAssertEqual(formData?["age"], .plain(""))
+    XCTAssertEqual(formData?["privacy"], .plain("on"))
+  }
+  
+  func test_readFormData_children() {
+    guard let file = readRequest(fromResource: "children-registration", withExtension: "request") else {
+      XCTFail("Failed to read request")
+      return
+    }
+    
+    let formData = readFormData(file)
+    XCTAssertEqual(formData?["child_first_name"], .list(["Boi", "Girl"]))
+    XCTAssertEqual(formData?["child_last_name"], .list(["Fam", "Fam"]))
+    XCTAssertEqual(formData?["child_age"], .list(["17", "16"]))
+    XCTAssertEqual(formData?["first_name"], .plain("Dad"))
+    XCTAssertEqual(formData?["last_name"], .plain("Fam"))
+    XCTAssertEqual(formData?["email"], .plain("fam@mail.com"))
+    XCTAssertEqual(formData?["phone"], .plain("049127495"))
+    XCTAssertEqual(formData?["age"], .plain(""))
+    XCTAssertEqual(formData?["privacy"], .plain("on"))
   }
   
   func test_response() {

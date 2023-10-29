@@ -56,7 +56,9 @@ let package = Package(
       ],
       path: "Tests",
       resources: [
-        .process("adult-registration.request")
+        .process("adult-registration.request"),
+        .process("child-registration.request"),
+        .process("children-registration.request")
       ],
       swiftSettings: [
         .enableUpcomingFeature("BareSlashRegexLiterals")
