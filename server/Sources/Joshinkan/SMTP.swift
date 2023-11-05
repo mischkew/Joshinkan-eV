@@ -152,7 +152,11 @@ enum SmtpError: Error {
   case curlFailed(String)
 }
 
-struct SMTP {
+protocol SMTPClient {
+    func send(_ mail: Mail) throws
+}
+
+struct SMTP: SMTPClient {
   let email: String
   let password: String
   let hostname: String

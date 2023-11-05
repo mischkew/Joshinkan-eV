@@ -24,58 +24,64 @@ enum HTTPStatus: Int {
     }
 }
 
-protocol Response {
-    func write() -> Void
-}
-
-struct StringResponse: Response {
-    var status: HTTPStatus
-    var headers: [String: String] = [:]
-    var body: String // NOTE(sven): Must be an ascii string!
-
-    func write() {
-        FCGI_puts("HTTP/1.1 \(status.rawValue) \(status.name)")
-        FCGI_puts("Content-Length: \(body.lengthOfBytes(using: .ascii))")
-        for (key, value) in headers.sorted(by: { $0.0 < $1.0 }) {
-            FCGI_puts("\(key): \(value)")
-        }
-        FCGI_puts("")
-        FCGI_puts(body)
-    }
-}
-
 let jsonEncoder = JSONEncoder()
 
-struct JSONResponse: Response {
+struct Response {
     var status: HTTPStatus
     var headers: [String: String] = [:]
-    var json: Codable
+    var text: String?
+    var json: Codable?
 
     func jsonDataToString(_ data: Data) -> String? {
         String(data: data, encoding: .ascii)
     }
 
-    func write() {
+    private func writeBody(body: String) {
+        FCGI_puts("HTTP/1.1 \(status.rawValue) \(status.name)")
+
+        let length = body.lengthOfBytes(using: .ascii)
+        FCGI_puts("Content-Length: \(length)")
+
+        for (key, value) in headers.sorted(by: { $0.0 < $1.0 }) {
+            FCGI_puts("\(key): \(value)")
+        }
+
+        FCGI_puts("")
+        FCGI_puts(body)
+    }
+
+    private func writeJson() {
         let body: String
         do {
-            let data = try jsonEncoder.encode(json)
+            let data = try jsonEncoder.encode(json!)
             body = jsonDataToString(data)!
         } catch {
-            let body = try! jsonEncoder.encode(["error": "internal error", "message": "could not construct response"])
-            let response = StringResponse(
+            let data = try! jsonEncoder.encode([
+                "error": "internal error",
+                "message": "could not construct response",
+            ])
+            let error = Response(
                 status: .INTERNAL_SERVER_ERROR,
                 headers: ["Content-Type": "application/json"],
-                body: jsonDataToString(body)!
+                text: jsonDataToString(data)!
             )
-            response.write()
+            error.write()
             return
         }
 
         var headers = headers
         headers["Content-Type"] = "application/json"
 
-        let response = StringResponse(status: status, headers: headers, body: body)
+        let response = Response(status: status, headers: headers, text: body)
         response.write()
+    }
+
+    func write() {
+        if let json {
+            writeJson()
+        } else {
+            writeBody(body: text ?? "")
+        }
     }
 }
 
@@ -168,23 +174,43 @@ func loopAcceptAndDo(_ handler: () -> Void) {
     }
 }
 
-struct Route {
-    let path: URL
-    let handler: (_ server: inout MailServer) -> Response
+enum Method: String {
+    case GET
+    case POST
 }
 
-func matchAndExecuteRoutes(routes: [Route], server: inout MailServer) {
-    guard let scriptName = env("SCRIPT_NAME") else { return }
+struct Route<Context> {
+    let path: URL
+    var method: Method = .GET
+    let handler: (_ context: Context) -> Response
+}
+
+
+func matchRoutes<Context>(_ routes: [Route<Context>], context: Context) -> Response {
+    guard
+        let scriptName = env("SCRIPT_NAME"),
+        let method = env("REQUEST_METHOD") else {
+        return Response(
+            status: .INTERNAL_SERVER_ERROR,
+            text: "Server not initialised"
+        )
+    }
     let current = URL(string: scriptName)
 
     for route in routes {
-        if current == route.path {
-            let response = route.handler(&server)
-            response.write()
-            return
+        if current == route.path && method == route.method.rawValue {
+            return route.handler(context)
         }
     }
 
-    let response = StringResponse(status: .NOT_FOUND, headers: ["Location": "/404"], body: "")
+    return Response(
+        status: .NOT_FOUND,
+        headers: ["Content-Type": "text/html"],
+        text: "<center><h1>Not Found</h1></center>"
+    )
+}
+
+func matchAndExecuteRoutes<Context>(_ routes: [Route<Context>], context: Context) {
+    let response = matchRoutes(routes, context: context)
     response.write()
 }

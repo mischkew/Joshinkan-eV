@@ -175,7 +175,7 @@ final class HTTPTests: XCTestCase {
     func test_response() {
         let capture = Capture()
 
-        let response = StringResponse(status: .OK, body: "Hello World")
+        let response = Response(status: .OK, text: "Hello World")
         response.write()
 
         let body = capture.read()
@@ -187,7 +187,7 @@ final class HTTPTests: XCTestCase {
         defer { FCGI_Finish() }
         let capture = Capture()
 
-        let response = StringResponse(status: .NOT_FOUND, body: "Hello World")
+        let response = Response(status: .NOT_FOUND, text: "Hello World")
         response.write()
 
         let body = capture.read()
@@ -202,10 +202,10 @@ final class HTTPTests: XCTestCase {
         defer { FCGI_Finish() }
         let capture = Capture()
 
-        let response = StringResponse(
+        let response = Response(
             status: .OK,
             headers: ["Content-Type": "text/html"],
-            body: "Hello World"
+            text: "Hello World"
         )
         response.write()
 
@@ -223,7 +223,7 @@ final class HTTPTests: XCTestCase {
         let capture = Capture()
 
         let json = ["message": "Hello World"]
-        let response = JSONResponse(
+        let response = Response(
             status: .OK,
             json: json
         )
@@ -244,7 +244,7 @@ final class HTTPTests: XCTestCase {
         let capture = Capture()
 
         let json = ["message": "Hello World"]
-        let response = JSONResponse(
+        let response = Response(
             status: .OK,
             headers: ["Custom-Header": "Is-Me"],
             json: json
