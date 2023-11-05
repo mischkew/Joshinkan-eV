@@ -144,7 +144,8 @@ endif
     -- server \
       --email $(SMTP_EMAIL) \
       --password $(SMTP_PASSWORD) \
-      --reply-to "sven.mkw+reply@gmail.com"
+      --reply-to "sven.mkw+reply@gmail.com" \
+      --domain "http://localhost:3000"
 
 .PHONY: stop-backend
 stop-backend:
