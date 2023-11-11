@@ -45,13 +45,13 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             let age = childrenAges[index]
 
             return """
-            <b>Kind #\(index + 1)</b>
-            Name: \(firstName) \(lastName)
-            Alter: \(age)
+            <b>Kind #\(index + 1)</b><br/>
+            Name: \(firstName) \(lastName)<br/>
+            Alter: \(age)<br/>
             """
         }
 
-        let childrenBlocks = (0 ..< childrenFirstNames.count).map(makeChildBlock).joined(separator: "\n")
+        let childrenBlocks = (0 ..< childrenFirstNames.count).map(makeChildBlock).joined(separator: "\n<br>")
         let registrationMail = Mail(
             from: context.sender,
             to: context.replyTo != nil ? [context.replyTo!] : [],
@@ -59,14 +59,14 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             bcc: context.bcc,
             subject: "Anmeldung zum Probetraining: Kinder (\(childrenFirstNames.count))",
             body: """
-            Neuanmeldung zum Probetraining für <b>Kinder</b>.
-
+            Neuanmeldung zum Probetraining für <b>Kinder</b>.<br/>
+            <br/>
             \(childrenBlocks)
-
-            <b>Elternteil</b>
-            Name: \(firstName) \(lastName)
-            Email: \(email)
-            Telefon: \(phone)
+            <br/>
+            <b>Elternteil</b><br/>
+            Name: \(firstName) \(lastName)<br/>
+            Email: \(email)<br/>
+            Telefon: \(phone)<br/>
             """
         )
 
@@ -101,17 +101,17 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             bcc: context.bcc + [context.sender],
             subject: "Joshinkan Werder Karate - Anmeldung zum Probetraining",
             body: """
-            Liebe Familie \(lastName),
-
+            Liebe Familie \(lastName),<br/>
+            <br/>
             Vielen Dank für die Anmeldung von \(makeNameList(childrenFirstNames)) \
-            zum Probetraining.
-
-            Einer unserer Trainer wird sich in kürze bei euch melden und die Anmeldung mit \
+            zum Probetraining.<br/>
+            <br/>
+            Einer unserer Trainer wird sich in Kürze bei euch melden und die Anmeldung mit \
             einem Termin zum ersten Training bestätigen. Falls ihr in der Zwischenzeit \
-            weitere Fragen, habt findet ihr Infos <a href="\(context.domain)/kontakt">hier</a>.
-
-            Liebe Grüße,
-            Das Joshinkan Team
+            weitere Fragen habt, findet ihr Infos <a href="\(context.domain)/kontakt">hier</a>.<br/>
+            <br/>
+            Liebe Grüße,<br/>
+            Das Joshinkan Team<br/>
             """
         )
 
@@ -139,12 +139,12 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             bcc: context.bcc,
             subject: "Anmeldung zum Probetraining: Erwachsene",
             body: """
-            Neuanmeldung zum Probetraining für <b>Erwachsene</b>.
-
-            Name: \(firstName) \(lastName)
-            Alter: \(age)
-            Email: \(email)
-            Telefon: \(phone)
+            Neuanmeldung zum Probetraining für <b>Erwachsene</b>.<br/>
+            <br/>
+            Name: \(firstName) \(lastName)<br/>
+            Alter: \(age)<br/>
+            Email: \(email)<br/>
+            Telefon: \(phone)<br/>
             """
         )
 
@@ -169,16 +169,16 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             bcc: context.bcc + [context.sender],
             subject: "Joshinkan Werder Karate - Anmeldung zum Probetraining",
             body: """
-            Hallo \(firstName),
-
-            Vielen Dank für die Anmeldung zum Probetraining.
-
-            Einer unserer Trainer wird sich in kürze bei dir melden und die Anmeldung mit \
+            Hallo \(firstName),<br/>
+            <br/>
+            Vielen Dank für die Anmeldung zum Probetraining.<br/>
+            <br/>
+            Einer unserer Trainer wird sich in Kürze bei dir melden und die Anmeldung mit \
             einem Termin zum ersten Training bestätigen. Falls du in der Zwischenzeit \
-            weitere Fragen hast, findest du Infos <a href="\(context.domain)/kontakt">hier</a>.
-
-            Liebe Grüße,
-            Das Joshinkan Team
+            weitere Fragen hast, findest du Infos <a href="\(context.domain)/kontakt">hier</a>.<br/>
+            <br/>
+            Liebe Grüße,<br/>
+            Das Joshinkan Team<br/>
             """
         )
 

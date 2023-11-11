@@ -157,3 +157,59 @@ final class TrialRegistrationTests: XCTestCase {
         XCTAssert(acknowledgementMail.body.contains("Vielen Dank für die Anmeldung von Boi und Girl zum Probetraining."))
     }
 }
+
+final class EmailTests: XCTestCase {
+    override func setUp() {}
+
+    func test_sendEmailAdult() {
+        guard let smptEmail = env("SMTP_EMAIL") else {
+            XCTFail("SMTP_EMAIL not defined")
+            return
+        }
+        guard let smptPassword = env("SMTP_PASSWORD") else {
+            XCTFail("SMTP_PASSWORD not defined")
+            return
+        }
+
+        let smtp = SMTP(email: smptEmail, password: smptPassword, hostname: "smtps://smtp.gmail.com:465")
+        let context = ServerContext(
+            domain: "http://localhost:3000",
+            sender: User(name: "Sender", email: smptEmail),
+            smtp: smtp,
+            replyTo: User(name: "ReplyTo", email: "sven.mkw+replyto@gmail.com"),
+            cc: [User(name: "CC1", email: "sven.mkw+cc1@gmail.com")],
+            bcc: [User(name: "CC2", email: "sven.mkw+bcc1@gmail.com")]
+        )
+        let client = Client(context: context)
+        let response = client.request("adult-registration")
+        XCTAssertEqual(response.status, .OK)
+        XCTAssertNotNil(response.json)
+        XCTAssertEqual(response.flatJson()["message"], "Email sent.")
+    }
+    
+    func test_sendEmailChildren() {
+        guard let smptEmail = env("SMTP_EMAIL") else {
+            XCTFail("SMTP_EMAIL not defined")
+            return
+        }
+        guard let smptPassword = env("SMTP_PASSWORD") else {
+            XCTFail("SMTP_PASSWORD not defined")
+            return
+        }
+
+        let smtp = SMTP(email: smptEmail, password: smptPassword, hostname: "smtps://smtp.gmail.com:465")
+        let context = ServerContext(
+            domain: "http://localhost:3000",
+            sender: User(name: "Sender", email: smptEmail),
+            smtp: smtp,
+            replyTo: User(name: "ReplyTo", email: "sven.mkw+replyto@gmail.com"),
+            cc: [User(name: "CC1", email: "sven.mkw+cc1@gmail.com")],
+            bcc: [User(name: "CC2", email: "sven.mkw+bcc1@gmail.com")]
+        )
+        let client = Client(context: context)
+        let response = client.request("children-registration")
+        XCTAssertEqual(response.status, .OK)
+        XCTAssertNotNil(response.json)
+        XCTAssertEqual(response.flatJson()["message"], "Email sent.")
+    }
+}
