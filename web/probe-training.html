@@ -38,12 +38,12 @@
         <pretty-input
           name="child_first_name"
           required>
-          <span slot="label">Vorname</span>
+          <span slot="label">Vorname des Kindes</span>
         </pretty-input>
         <pretty-input
           name="child_last_name"
           required>
-          <span slot="label">Nachname</span>
+          <span slot="label">Nachname des Kindes</span>
         </pretty-input>
 
         <pretty-input
@@ -52,7 +52,7 @@
           max="17"
           type="number"
           required>
-          <span slot="label">Alter</span>
+          <span slot="label">Alter des Kindes</span>
           <span slot="suffix">Jahre</span>
         </pretty-input>
       </fieldset>
@@ -368,7 +368,7 @@
         }
 
         function enableFormInputs() {
-          form.querySelector("button").setAttribute('disabled', '');
+          form.querySelector("button").removeAttribute('disabled');
           prettyInputs.forEach((input) => {
             input.removeAttribute('disabled');
           });
@@ -387,6 +387,8 @@
         }
         if (!isValid) {
           enableFormInputs();
+          let errorElement = document.getElementById("form-backend-error")
+          errorElement.innerText = "Einige Eingaben enthalten Fehler. Bitte überprüfe die Angaben nochmals.";
           return false;
         }
 
@@ -400,7 +402,7 @@
         }
 
         try {
-          let response = await fetch('/api/trial-registration', { // TODO implement
+          let response = await fetch('/api/trial-registration', {
             method: 'POST',
             body: formData
           });
@@ -410,7 +412,7 @@
             let errorElement = document.getElementById("form-backend-error")
             try {
               let json = await response.json();
-              errorElement.innerText = json.message;
+              errorElement.innerText = json.error;
             } catch(error) {
               console.log(error);
               errorElement.innerText = "Serverseitiger Fehler. Versuche es später nochmal oder schreibe uns direkt eine Email.";
