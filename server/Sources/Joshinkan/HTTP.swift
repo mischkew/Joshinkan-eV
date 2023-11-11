@@ -16,10 +16,10 @@ enum HTTPStatus: Int {
 
     var name: String {
         switch self {
-        case .OK: return "OK"
-        case .BAD_REQUEST: return "Bad Request"
-        case .NOT_FOUND: return "Not Found"
-        case .INTERNAL_SERVER_ERROR: return "Internal Server Error"
+            case .OK: return "OK"
+            case .BAD_REQUEST: return "Bad Request"
+            case .NOT_FOUND: return "Not Found"
+            case .INTERNAL_SERVER_ERROR: return "Internal Server Error"
         }
     }
 }
@@ -39,8 +39,10 @@ struct Response {
     private func writeBody(body: String) {
         FCGI_puts("HTTP/1.1 \(status.rawValue) \(status.name)")
 
-        let length = body.lengthOfBytes(using: .ascii)
-        FCGI_puts("Content-Length: \(length)")
+        // NOTE(sven): This is a weird nginx bug where the status line is ignored and
+        // the status header must be passed explicitly.
+        FCGI_puts("Status: \(status.rawValue) \(status.name)")
+        FCGI_puts("Content-Length: \(body.count + 1)")
 
         for (key, value) in headers.sorted(by: { $0.0 < $1.0 }) {
             FCGI_puts("\(key): \(value)")
@@ -94,11 +96,29 @@ func contentLength() -> Int? {
     return Int(contentLengthEnv)
 }
 
-func readBody(_ file: FileHandle = FileHandle.standardInput) -> String? {
+func readBody(_ file: FileHandle? = nil) -> String? {
     guard let contentLength = contentLength() else { return nil }
     // TODO: assert content type charset
-    guard let bodyData = try? file.read(upToCount: contentLength) else { return nil }
-    let body = String(decoding: bodyData, as: UTF8.self)
+    var data: Data?
+    if let file {
+        data = try? file.read(upToCount: contentLength)
+    } else {
+        // let FCGI_stdin: UnsafeMutablePointer<FCGI_FILE> =
+        // let FCGI_stdin: FCGI_FILE = _fcgi_sF
+        // var characters = [Int32](count: contentLength, repeating: 0)
+        data = Data(count: contentLength)
+        for index in 0 ..< contentLength {
+            // this is -1 in tests because input fcgi stream got closed
+            // can we use FCGI funcs in tests?
+            // print(index)
+            let char = FCGI_getchar()
+            if char < 0 { break }
+            data![index] = UInt8(char)
+        }
+    }
+
+    guard let data else { return nil }
+    let body = String(decoding: data, as: UTF8.self)
     return body
 }
 
@@ -107,8 +127,10 @@ enum FormValue: Equatable {
     case list(_ list: [String])
 }
 
-func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: FormValue]? {
-    guard let contentLength = contentLength() else { return nil }
+func readFormData(_ file: FileHandle? = nil) -> [String: FormValue]? {
+    // NOTE(sven): Our test fixtures are stored with default linebreaks.
+    // A browser will use a compliant CRLF to separate headers and boundaries.
+    let linebreak = env("USE_LINEBREAK") != nil ? "\n" : "\r\n"
     guard let contentType = env("CONTENT_TYPE") else { return nil }
 
     let contentTypeRegex = /^multipart\/form-data;\s*boundary=(?<boundary>.+)$/
@@ -117,7 +139,9 @@ func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: For
 
     guard let body = readBody(file) else { return nil }
     let components = body.components(separatedBy: "--" + boundary)
-    guard components[components.endIndex - 1] == "--\n" else { return nil }
+    // TODO: bug - fixture data is stored without \r, only \n. That's why browser
+    // parsing fails and that's why content length seems to mismatch
+    guard components[components.endIndex - 1] == "--\(linebreak)" else { return nil }
 
     var formData: [String: FormValue] = [:]
 
@@ -125,11 +149,11 @@ func readFormData(_ file: FileHandle = FileHandle.standardInput) -> [String: For
     // component which are double hyphens.
     for i in 1 ..< components.count - 1 {
         let component = components[i]
-        let componentParts = component.split(separator: "\n\n", maxSplits: 1)
+        let componentParts = component.split(separator: "\(linebreak)\(linebreak)", maxSplits: 1)
         let componentHeader = componentParts[0].trimmingCharacters(in: .whitespacesAndNewlines)
         var headers: [String: String] = [:]
 
-        for line in componentHeader.split(separator: "\n") {
+        for line in componentHeader.split(separator: "\(linebreak)") {
             let headerParts = line.split(separator: ":", maxSplits: 1)
             let key = String(headerParts[0]).capitalized
             let value = String(headerParts[1])
@@ -184,7 +208,6 @@ struct Route<Context> {
     var method: Method = .GET
     let handler: (_ context: Context) -> Response
 }
-
 
 func matchRoutes<Context>(_ routes: [Route<Context>], context: Context) -> Response {
     guard

@@ -52,21 +52,31 @@ func readFixture(
     return file
 }
 
+typealias FCGI_FileHandle = UnsafeMutablePointer<FCGI_FILE>
+
+func FCGI_readLine() -> String {
+    let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 4096)
+    defer { buffer.deallocate() }
+    FCGI_gets(buffer)
+    return String(cString: buffer)
+}
+
 /**
  * Reads HTTP request from a file and sets the environment variables to the received
  * headers. Returns a FileHandle from which the body can be read.
  */
-func readRequest(fromResource: String, withExtension: String) -> FileHandle? {
-    guard
-        let filepath = Bundle.module.url(
-            forResource: fromResource,
-            withExtension: withExtension
-        ) else { return nil }
-    guard let file = freopen(filepath.path(), "r", stdin) else { return nil }
-    // defer { fclose(file) }
+func readRequest(fromResource: String, withExtension: String) -> FCGI_FileHandle? {
+    FCGI_Accept()
+    let FCGI_stdin = FCGI_stdin_export
+    guard let filepath = Bundle.module.url(forResource: fromResource, withExtension: withExtension) else { return nil }
+    guard let file = FCGI_freopen(filepath.path(), "r", FCGI_stdin) else { return nil }
 
-    guard let methodLine = readLine() else { return nil }
-    let parts = methodLine.split(separator: " ", maxSplits: 2)
+//    guard let methodLine = readLine() else { return nil }
+    let methodLine = FCGI_readLine()
+    let parts = methodLine
+        .trimmingCharacters(in: CharacterSet.newlines)
+        .split(separator: " ", maxSplits: 2)
+    guard parts.count == 3 else { return nil }
     let method = String(parts[0])
     let scriptName = String(parts[1])
     let httpVersion = String(parts[2])
@@ -74,7 +84,8 @@ func readRequest(fromResource: String, withExtension: String) -> FileHandle? {
     setenv("SCRIPT_NAME", scriptName, 1)
     setenv("SERVER_PROTOCOL", httpVersion, 1)
 
-    while let line = readLine() {
+    while true {
+        let line = FCGI_readLine()
         if line == "" { break }
         let parts = line.split(separator: ":", maxSplits: 1)
         let key = parts[0]
@@ -87,22 +98,22 @@ func readRequest(fromResource: String, withExtension: String) -> FileHandle? {
 
     // NOTE(sven): The object oriented wrapper around the C-style file handle gets
     // confused when freopen and readLine are combined. We reset the file position.
-    try! FileHandle.standardInput.seek(toOffset: UInt64(ftell(file)))
-    return FileHandle.standardInput
+    // try! FileHandle.standardInput.seek(toOffset: UInt64(FCGI_ftell(file)))
+    return file
 }
 
 final class HTTPTests: XCTestCase {
     func test_readBody() {
-        guard
-            let file = readRequest(
-                fromResource: "adult-registration",
-                withExtension: "request"
-            ) else {
+        let file = readRequest(
+            fromResource: "adult-registration",
+            withExtension: "request"
+        )
+        guard file != nil else {
             XCTFail("Failed to read request")
             return
         }
 
-        let body = readBody(file)
+        let body = readBody()
         XCTAssertEqual(
             body?.suffix(46),
             "on\n------WebKitFormBoundaryiB5iskbmcAfH1zPo--\n"
@@ -110,16 +121,13 @@ final class HTTPTests: XCTestCase {
     }
 
     func test_readFormData_adult() {
-        guard
-            let file = readRequest(
-                fromResource: "adult-registration",
-                withExtension: "request"
-            ) else {
+        let file = readRequest(fromResource: "adult-registration", withExtension: "request")
+        guard file != nil else {
             XCTFail("Failed to read request")
             return
         }
 
-        let formData = readFormData(file)
+        let formData = readFormData()
         XCTAssertEqual(formData?["first_name"], .plain("sven"))
         XCTAssertEqual(formData?["last_name"], .plain("mkw"))
         XCTAssertEqual(formData?["email"], .plain("sven.mkw@gmail.com"))
@@ -129,16 +137,16 @@ final class HTTPTests: XCTestCase {
     }
 
     func test_readFormData_child() {
-        guard
-            let file = readRequest(
-                fromResource: "child-registration",
-                withExtension: "request"
-            ) else {
+        let file = readRequest(
+            fromResource: "child-registration",
+            withExtension: "request"
+        )
+        guard file != nil else {
             XCTFail("Failed to read request")
             return
         }
 
-        let formData = readFormData(file)
+        let formData = readFormData()
         XCTAssertEqual(formData?["child_first_name"], .list(["Boi"]))
         XCTAssertEqual(formData?["child_last_name"], .list(["Fam"]))
         XCTAssertEqual(formData?["child_age"], .list(["17"]))
@@ -151,16 +159,13 @@ final class HTTPTests: XCTestCase {
     }
 
     func test_readFormData_children() {
-        guard
-            let file = readRequest(
-                fromResource: "children-registration",
-                withExtension: "request"
-            ) else {
+        let file = readRequest(fromResource: "children-registration", withExtension: "request")
+        guard file != nil else {
             XCTFail("Failed to read request")
             return
         }
 
-        let formData = readFormData(file)
+        let formData = readFormData()
         XCTAssertEqual(formData?["child_first_name"], .list(["Boi", "Girl"]))
         XCTAssertEqual(formData?["child_last_name"], .list(["Fam", "Fam"]))
         XCTAssertEqual(formData?["child_age"], .list(["17", "16"]))
@@ -174,34 +179,24 @@ final class HTTPTests: XCTestCase {
 
     func test_response() {
         let capture = Capture()
-
         let response = Response(status: .OK, text: "Hello World")
         response.write()
 
         let body = capture.read()
-        XCTAssertEqual(body, "HTTP/1.1 200 OK\nContent-Length: 11\n\nHello World\n")
+        XCTAssertEqual(body, "HTTP/1.1 200 OK\nStatus: 200 OK\nContent-Length: 12\n\nHello World\n")
     }
 
     func test_responseWithStatus() {
-        FCGI_Accept()
-        defer { FCGI_Finish() }
         let capture = Capture()
-
         let response = Response(status: .NOT_FOUND, text: "Hello World")
         response.write()
 
         let body = capture.read()
-        XCTAssertEqual(
-            body,
-            "HTTP/1.1 404 Not Found\nContent-Length: 11\n\nHello World\n"
-        )
+        XCTAssertEqual(body, "HTTP/1.1 404 Not Found\nStatus: 404 Not Found\nContent-Length: 12\n\nHello World\n")
     }
 
     func test_responseWithHeaders() {
-        FCGI_Accept()
-        defer { FCGI_Finish() }
         let capture = Capture()
-
         let response = Response(
             status: .OK,
             headers: ["Content-Type": "text/html"],
@@ -212,16 +207,18 @@ final class HTTPTests: XCTestCase {
         let body = capture.read()
         XCTAssertEqual(
             body,
-            "HTTP/1.1 200 OK\nContent-Length: 11\nContent-Type: text/html\n\nHello World\n"
+            "HTTP/1.1 200 OK\n"
+                + "Status: 200 OK\n"
+                + "Content-Length: 12\n"
+                + "Content-Type: text/html\n\n"
+                + "Hello World\n"
         )
     }
 
     func test_jsonResponse() {
         FCGI_Accept()
-        defer { FCGI_Finish() }
 
         let capture = Capture()
-
         let json = ["message": "Hello World"]
         let response = Response(
             status: .OK,
@@ -232,17 +229,18 @@ final class HTTPTests: XCTestCase {
         let body = capture.read()
         XCTAssertEqual(
             body,
-            "HTTP/1.1 200 OK\nContent-Length: 25\nContent-Type: application/json\n\n{\"message\":\"Hello World\"}\n"
+            "HTTP/1.1 200 OK\n"
+                + "Status: 200 OK\n"
+                + "Content-Length: 26\n"
+                + "Content-Type: application/json\n\n"
+                + "{\"message\":\"Hello World\"}\n"
         )
     }
 
     func test_jsonResponseWithHeader() {
         FCGI_Accept()
-        defer {
-            FCGI_Finish()
-        }
-        let capture = Capture()
 
+        let capture = Capture()
         let json = ["message": "Hello World"]
         let response = Response(
             status: .OK,
@@ -255,7 +253,8 @@ final class HTTPTests: XCTestCase {
         XCTAssertEqual(
             body,
             "HTTP/1.1 200 OK\n"
-                + "Content-Length: 25\n"
+                + "Status: 200 OK\n"
+                + "Content-Length: 26\n"
                 + "Content-Type: application/json\n"
                 + "Custom-Header: Is-Me\n\n"
                 + "{\"message\":\"Hello World\"}\n"
@@ -296,7 +295,10 @@ class Capture {
     }
 
     func read() -> String {
-        String(cString: buffer)
+        // NOTE(sven): In case we read more characters then we have space in the buffer, we always 0-terminate
+        // the buffer so it can be converted to a C-String regardless.
+        buffer[buffer.endIndex - 1] = 0
+        return String(cString: buffer)
     }
 
     func restore() {

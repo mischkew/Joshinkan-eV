@@ -56,6 +56,9 @@ stop: stop-backend stop-nginx
 .PHONY: status
 status: status-backend status-nginx
 
+.PHONE: test
+test: test-backend
+
 #
 # Frontend
 #
@@ -81,6 +84,7 @@ assets:
 
 .PHONY: start-nginx
 start-nginx:
+	$(MAKE) stop-nginx
 	echo "Starting nginx"
 	mkdir -p logs
 	nginx -p ./ -c nginx.conf
@@ -122,6 +126,13 @@ build/web/%.html: web/%.html $(wildcard web/templates/*.html) $(wildcard web/com
 #
 # Backend
 #
+
+server/.swiftpm/server.xctestplan: server/template-server.xcrtestplan
+
+
+.PHONY: test-backend
+test-backend:
+	cd server && USE_LINEBREAK=1 swift test
 
 .PHONY: build-backend
 build-backend: build/server/server

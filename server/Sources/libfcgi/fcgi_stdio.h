@@ -61,6 +61,8 @@ DLLAPI extern	FCGI_FILE	_fcgi_sF[];
 #define FCGI_stdout	(&_fcgi_sF[1])
 #define FCGI_stderr	(&_fcgi_sF[2])
 
+FCGI_FILE *FCGI_stdin_export = FCGI_stdin;
+
 /*
  * Wrapper function prototypes, grouped according to sections
  * of Harbison & Steele, "C: A Reference Manual," fourth edition,

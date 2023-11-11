@@ -61,9 +61,6 @@ let package = Package(
         .process("child-registration.request"),
         .process("children-registration.request"),
         .process("print-env.request")
-      ],
-      swiftSettings: [
-        .enableUpcomingFeature("BareSlashRegexLiterals")
       ]
     )
   ]
