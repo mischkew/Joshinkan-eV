@@ -377,10 +377,9 @@
 
         // NOTE(sven): Some form elements might be hidden depending on whether
         // children or adults are signing up.
-        const prettyInputs = form.querySelectorAll(
-          '& :not([hidden]) pretty-input,'
-            + '& :not([hidden]) child-form'
-        );
+        // NOTE(sven): I wanted to do `form.querySelectorAll` but the
+        // `:not([hidden])` clause misbehaves in that case.
+        const prettyInputs = document.querySelectorAll('form :not([hidden]) :is(pretty-input, child-form)');
 
         function disableFormInputs() {
           form.querySelectorAll("button").forEach((node) => node.setAttribute('disabled', ''));
