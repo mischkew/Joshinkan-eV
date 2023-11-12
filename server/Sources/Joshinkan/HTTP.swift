@@ -237,3 +237,9 @@ func matchAndExecuteRoutes<Context>(_ routes: [Route<Context>], context: Context
     let response = matchRoutes(routes, context: context)
     response.write()
 }
+
+func hostDomain() -> String? {
+    let scheme = env("X_SCHEME") ?? "http"
+    guard let host = env("HTTP_HOST") else { return nil }
+    return "\(scheme)://\(host)"
+}

@@ -108,7 +108,7 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             <br/>
             Einer unserer Trainer wird sich in Kürze bei euch melden und die Anmeldung mit \
             einem Termin zum ersten Training bestätigen. Falls ihr in der Zwischenzeit \
-            weitere Fragen habt, findet ihr Infos <a href="\(env("HTTP_HOST") ?? context.domain)/kontakt">hier</a>.<br/>
+            weitere Fragen habt, findet ihr Infos <a href="\(hostDomain() ?? context.domain)/kontakt">hier</a>.<br/>
             <br/>
             Liebe Grüße,<br/>
             Das Joshinkan Team<br/>
@@ -175,7 +175,7 @@ let trialRegistration = R(path: URL(string: "/api/trial-registration")!, method:
             <br/>
             Einer unserer Trainer wird sich in Kürze bei dir melden und die Anmeldung mit \
             einem Termin zum ersten Training bestätigen. Falls du in der Zwischenzeit \
-            weitere Fragen hast, findest du Infos <a href="\(env("HTTP_HOST") ?? context.domain)/kontakt">hier</a>.<br/>
+            weitere Fragen hast, findest du Infos <a href="\(hostDomain() ?? context.domain)/kontakt">hier</a>.<br/>
             <br/>
             Liebe Grüße,<br/>
             Das Joshinkan Team<br/>
