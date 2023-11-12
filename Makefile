@@ -117,7 +117,7 @@ logs-access:
 .PHONY: build-frontend
 build-frontend: assets $(subst web,build/web,$(wildcard web/*.html))
 
-build/web/%.html: web/%.html $(wildcard web/templates/*.html) $(wildcard web/components/*.html)
+build/web/%.html: web/%.html $(wildcard web/templates/*.html) $(wildcard web/components/*.html) $(wildcard web/stylesheets/*.css)
 	$(MAKE) frontend-dependencies
 	@echo "Building $< to $@"
 	@mkdir -p $$(dirname $@)

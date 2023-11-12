@@ -175,11 +175,6 @@ svg {
   object-fit: cover;
 }
 
-/* forms */
-input {
-  width: 100%;
-}
-
 /* misc */
 hr {
   border: 0;

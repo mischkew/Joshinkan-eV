@@ -25,6 +25,29 @@ fieldset legend {
   padding: 0 1rem;
 }
 
+/* For a list of radio buttons, make the text wrap nicely before the button.
+   Usage:
+   <label class="radio-button">
+          <input type="radio" />
+          <span>Some label text<span>
+   </label>
+*/
+label.radio-button {
+  display: flex;
+  align-items: flex-start;
+}
+
+label.radio-button > input[type=radio] {
+  margin-top: 0.4rem;
+  flex-shrink: 0;
+}
+
+label.radio-button > span {
+  flex-grow: 1;
+}
+
+
+
 /* Tooltip container */
 .tooltip {
   position: relative;
