@@ -137,7 +137,7 @@
 
       if (input.getAttribute("type") == "tel") {
         if (!input.hasAttribute("pattern")) {
-          input.setAttribute("pattern", '\\+?\\d+');
+          input.setAttribute("pattern", '\\+?[\\d\\s]+');
         }
       } else if (input.getAttribute("type") == "checkbox") {
         // NOTE(sven): For checkboxes, we want the label to appear right of the
@@ -182,7 +182,9 @@
       this.activeErrors = new Set();
 
       input.onchange = (event) => {
-        input.value = input.value.trim();
+        // NOTE(sven): Removes leading and trailing whitespace and collapses all
+        // mutliple appearances of whitespace into a single whitespace character.
+        input.value = input.value.trim().replaceAll(/\s+/gi, ' ');
         this.validate(event);
       };
       this.input = input;
