@@ -7,6 +7,16 @@ ifneq (,$(wildcard .env))
 	include .env
 endif
 
+ifndef SMTP_EMAIL
+$(error Variable SMTP_EMAIL is not set. Check .env or define environment variable)
+endif
+ifndef SMTP_PASSWORD
+$(error Variable SMTP_PASSWORD is not set. Check .env or define environment variable)
+endif
+ifndef DOMAIN
+$(error Variable DOMAIN is not set. Check .env or define environment variable)
+endif
+
 
 #
 # General
@@ -131,9 +141,6 @@ build/web/%.html: web/%.html $(wildcard web/templates/*.html) $(wildcard web/com
 # Backend
 #
 
-server/.swiftpm/server.xctestplan: server/template-server.xcrtestplan
-
-
 .PHONY: test-backend
 test-backend:
 	cd server && USE_LINEBREAK=1 swift test
@@ -141,15 +148,19 @@ test-backend:
 .PHONY: build-backend
 build-backend: build/server/server
 
-.PHONY: start-backend
-start-backend: build/server/server
-ifndef SMTP_EMAIL
-$(error Variable SMTP_EMAIL is not set. Check .env or define environment variable)
+
+ifdef SMTP_CC
+SMTP_CC_CMD=$(addprefix --cc ,$(SMTP_CC))
 endif
-ifndef SMTP_PASSWORD
-$(error Variable SMTP_PASSWORD is not set. Check .env or define environment variable)
+ifdef SMTP_BCC
+SMTP_BCC_CMD=$(addprefix --bcc ,$(SMTP_BCC))
+endif
+ifdef SMTP_REPLY_TO
+SMTP_REPLY_TO_CMD=--reply-to $(SMTP_REPLY_TO)
 endif
 
+.PHONY: start-backend
+start-backend: build/server/server
 	$(MAKE) stop-backend
 	echo "Starting backend"
 	spawn-fcgi \
@@ -159,8 +170,10 @@ endif
     -- server \
       --email $(SMTP_EMAIL) \
       --password $(SMTP_PASSWORD) \
-      --reply-to "sven.mkw+reply@gmail.com" \
-      --domain "http://localhost:3000"
+			$(SMTP_CC_CMD) \
+      $(SMTP_BCC_CMD) \
+			$(SMTP_REPLY_TO_CMD) \
+      --domain $(DOMAIN)
 
 .PHONY: stop-backend
 stop-backend:
