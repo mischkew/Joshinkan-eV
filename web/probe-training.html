@@ -66,6 +66,7 @@
           name="child_last_name"
           required>
           <span slot="label">Nachname des Kindes</span>
+
         </pretty-input>
 
         <pretty-input
@@ -76,6 +77,7 @@
           required>
           <span slot="label">Alter des Kindes</span>
           <span slot="suffix">Jahre</span>
+          <span slot="error-min">Das Kindertraining ist erst ab {value} Jahren.</span>
         </pretty-input>
       </fieldset>
     </template>
@@ -159,7 +161,7 @@
       <h1>Probe&shy;training</h1>
       <section>
         <article>
-          <h2>Anmeldung</h2>
+          <h2 id="anmeldung">Anmeldung</h2>
           <p>
             Wir trainieren immer donnerstags. Informiere dich hier über
             unsere <a href="verein#trainingszeiten">Trainingszeiten</a>. Nach
@@ -452,7 +454,7 @@
           return false;
         }
 
-        window.location = "/anmeldung-erfolgreich"
+        window.location = "/anmeldung-erfolgreich#erfolgreich"
       }
 
       form.onchange = applyShowTargets;
