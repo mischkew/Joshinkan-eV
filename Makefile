@@ -95,8 +95,12 @@ stop-nginx:
 		echo "nginx not running"
 
 .PHONY: reload-nginx
-reload-nginx: nginx.conf
+reload-nginx: .should-reload
+
+.should-reload: nginx.conf $(wildcard *.pem)
+	@echo "reload nginx";
 	nginx -s reload -p ./ -c nginx.conf
+	@touch $@
 
 .PHONY: status-nginx
 status-nginx:
