@@ -79,7 +79,7 @@ struct Response {
     }
 
     func write() {
-        if let json {
+        if json != nil {
             writeJson()
         } else {
             writeBody(body: text ?? "")

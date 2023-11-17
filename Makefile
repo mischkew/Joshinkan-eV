@@ -16,6 +16,12 @@ endif
 ifndef DOMAIN
 $(error Variable DOMAIN is not set. Check .env or define environment variable)
 endif
+ifndef SSL_CERT
+$(error Variable SSL_CERT is not set. Check .env or define environment variable)
+endif
+ifndef SSL_KEY
+$(error Variable SSL_KEY is not set. Check .env or define environment variable)
+endif
 
 
 #
@@ -79,8 +85,6 @@ GSED_PATH = $(shell which gsed)
 
 # NOTE(sven): Install gnu-sed on OSX as otherwise shell command substitution is
 # not supported, which we need for templating.
-.PHONY: frontend-dependencies
-frontend-dependencies:
 ifeq ($(SYSTEM_NAME), Darwin)
 ifeq (,$(GSED_PATH))
 	brew install gnu-sed
@@ -97,11 +101,11 @@ start-nginx:
 	$(MAKE) stop-nginx
 	echo "Starting nginx"
 	mkdir -p logs
-	nginx -p ./ -c nginx.conf
+	nginx -p ./ -c build/nginx.conf
 
 .PHONY: stop-nginx
 stop-nginx:
-	@(nginx -s stop -p ./ -c nginx.conf >& /dev/null && echo "nginx stopped") || \
+	@(nginx -s stop -p ./ -c build/nginx.conf >& /dev/null && echo "nginx stopped") || \
 		echo "nginx not running"
 
 .PHONY: reload-nginx
@@ -109,16 +113,28 @@ reload-nginx: .should-reload
 
 .should-reload: nginx.conf $(wildcard *.pem)
 	@echo "reload nginx";
-	nginx -s reload -p ./ -c nginx.conf
+	nginx -s reload -p ./ -c build/nginx.conf
 	@touch $@
 
 .PHONY: status-nginx
 status-nginx:
-	@if [ -f nginx.pid ]; then \
-		(ps -p $$(cat nginx.pid) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
+	@if [ -f build/nginx.pid ]; then \
+		(ps -p $$(cat build/nginx.pid) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
 	else \
 		echo "nginx not running"; \
 	fi
+
+build/$(SSL_KEY): $(SSL_KEY)
+	cp $< $@
+
+build/$(SSL_CERT): $(SSL_CERT)
+	cp $< $@
+
+build/mime.types: mime.types
+	cp $< $@
+
+build/nginx.conf: nginx.tpl.conf build/mime.types build/$(SSL_KEY) build/$(SSL_CERT)
+	cp $< $@
 
 .PHONY: logs-error
 logs-error:
@@ -129,9 +145,15 @@ logs-access:
 	tail -f logs/access.log
 
 .PHONY: build-frontend
-build-frontend: assets $(subst web,build/web,$(wildcard web/*.html))
+build-frontend: assets $(addprefix build/,$(wildcard web/*.html)) build/nginx.conf
 
-build/web/%.html: web/%.html $(wildcard web/templates/*.html) $(wildcard web/components/*.html) $(wildcard web/stylesheets/*.css)
+build/web/%.html: \
+	web/%.html \
+	$(wildcard web/templates/*.html) \
+	$(wildcard web/components/*.html) \
+	$(wildcard web/stylesheets/*.css) \
+	$(wildcard web/scripts/*.sh)
+
 	$(MAKE) frontend-dependencies
 	@echo "Building $< to $@"
 	@mkdir -p $$(dirname $@)
@@ -166,7 +188,7 @@ start-backend: build/server/server
 	spawn-fcgi \
     -d build/server \
     -p 5000 \
-    -P fcgi.pid \
+    -P build/fcgi.pid \
     -- server \
       --email $(SMTP_EMAIL) \
       --password $(SMTP_PASSWORD) \
@@ -177,9 +199,9 @@ start-backend: build/server/server
 
 .PHONY: stop-backend
 stop-backend:
-	@if [ -f fcgi.pid ] && [ -n "$$(cat fcgi.pid)" ] ; then \
-		(kill $$(cat fcgi.pid) || echo "no such process") && \
-		rm fcgi.pid && \
+	@if [ -f build/fcgi.pid ] && [ -n "$$(cat build/fcgi.pid)" ] ; then \
+		(kill $$(cat build/fcgi.pid) || echo "no such process") && \
+		rm build/fcgi.pid && \
 		echo "backend stopped"; \
 	else \
 		echo "backend not running"; \
@@ -187,16 +209,14 @@ stop-backend:
 
 .PHONY: status-backend
 status-backend:
-	@if [ -f fcgi.pid ]; then \
-		(ps -p $$(cat fcgi.pid) >& /dev/null && echo "backend running") || echo "backend not running"; \
+	@if [ -f build/fcgi.pid ]; then \
+		(ps -p $$(cat build/fcgi.pid) >& /dev/null && echo "backend running") || echo "backend not running"; \
 	else \
 		echo "backend not running"; \
 	fi
 
 # NOTE(sven): Install fcgi and spawn-fcgi to support the nginx connection to the
 # backend.
-.PHONY: backend-dependencies
-backend-dependencies:
 ifeq ($(SYSTEM_NAME), Darwin)
 	@if [ ! -d $$(brew --prefix fcgi) ]; then \
     brew install fcgi; \
@@ -218,7 +238,6 @@ debug-build-dependencies:
 
 build/server/server: $(SWIFT_FILES)
 	@echo $^
-	$(MAKE) backend-dependencies
 	mkdir -p build/server
 	swift build --package-path server
 	cp $$(swift build --package-path server --show-bin-path)/Joshinkan ./build/server/server
