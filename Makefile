@@ -105,7 +105,7 @@ start-nginx:
 
 .PHONY: stop-nginx
 stop-nginx:
-	@(nginx -s stop -p ./ -c build/nginx.conf >& /dev/null && echo "nginx stopped") || \
+	@(nginx -s stop -p ./build -c nginx.conf >& /dev/null && echo "nginx stopped") || \
 		echo "nginx not running"
 
 .PHONY: reload-nginx
@@ -154,7 +154,6 @@ build/web/%.html: \
 	$(wildcard web/stylesheets/*.css) \
 	$(wildcard web/scripts/*.sh)
 
-	$(MAKE) frontend-dependencies
 	@echo "Building $< to $@"
 	@mkdir -p $$(dirname $@)
 	./web/scripts/include.sh $< > $@ || (rm $@ && exit 1)
