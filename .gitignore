@@ -7,3 +7,6 @@ server/.swiftpm
 
 # ephemeral Make targets
 .should-reload
+
+# python
+.python-version
