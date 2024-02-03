@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from enum import Enum, auto, IntEnum
 import dataclasses
 from dataclasses import dataclass
-from typing import Callable, Optional, Dict, Union, Iterable, Iterator, Any
+from typing import Callable, Optional, Dict, Union, Iterable, Iterator, Any, Protocol
 from functools import partialmethod, partial
 import traceback
 import json
@@ -60,7 +60,6 @@ WSGIStartResponse = Callable[
 ]
 # See: https://peps.python.org/pep-3333/#buffering-and-streaming
 WSGIResponse = Union[Iterable[bytes], Iterator[bytes]]
-WSGIApp = Callable[[WSGIEnv, WSGIStartResponse], WSGIResponse]
 Response = tuple[int, Optional[dict]]
 RequestHandler = Callable[[WSGIEnv], Response]
 
@@ -115,10 +114,17 @@ class RouterException(Exception):
     pass
 
 
+class AppConfig(Protocol):
+    PRINT_STACKTRACE: bool
+    LOGLEVEL: str
+
+
 class Router:
     def __init__(self):
         # NOTE(sven): Map from path -> method -> Route
         self.routes: dict[str, dict[str, Route]] = {}
+        self.context: Optional[Any] = None
+        self.config: Optional[AppConfig] = None
 
     def has_route(self, method: str, path: str) -> bool:
         return path in self.routes and method in self.routes[path]
@@ -149,6 +155,46 @@ class Router:
     def get_route(self, method: str, path: str) -> Route:
         return self.routes[path][method]
 
+    def with_context(self):
+        def wrapper(handler: RequestHandler) -> Response:
+            def handler_with_context(*args, **kwargs) -> Response:
+                if self.context is None:
+                    raise ValueError(
+                        "Context is not set. Use `router.set_context` when building the app."
+                    )
+
+                return handler(*args, **kwargs, context=self.context)
+
+            return handler_with_context
+
+        return wrapper
+
+        # TODO(sven): Add set_context method which can be an any object on the
+        # route. Will be configred when app is built, also helpful for
+        # tests. This decorator adds a context kwarg to the request handler. The
+        # user can define the context class in the type hints. Should be used
+        # for dependency injection instead of "global objects". Avoids mocking
+        # in tests.
+
+    def set_context(self, context: Any):
+        self.context = context
+
+    def with_config(self):
+        def wrapper(handler: RequestHandler) -> Response:
+            def handler_with_config(*args, **kwargs) -> Response:
+                if self.config is None:
+                    raise ValueError(
+                        "Config is not set. Use `router.set_config` when building the app."
+                    )
+                return handler(*args, **kwargs, config=self.config)
+
+            return handler_with_config
+
+        return wrapper
+
+    def set_config(self, config: AppConfig):
+        self.config = config
+
     get = partialmethod(make_route, "GET")
     post = partialmethod(make_route, "POST")
     head = partialmethod(make_route, "HEAD")
@@ -156,7 +202,23 @@ class Router:
     patch = partialmethod(make_route, "PATCH")
 
 
+class WSGIApp(Protocol):
+    router: Router
+    config: Config
+    context: Any
+
+    def __call__(
+        self, environ: WSGIEnv, start_response: WSGIStartResponse
+    ) -> WSGIResponse:
+        ...
+
+
 def make_app(router: Router) -> WSGIApp:
+    if router.config is None:
+        raise ValueError(
+            "Config is not set. Use `router.set_config` when building the app."
+        )
+
     def app(environ: WSGIEnv, start_response: WSGIStartResponse) -> WSGIResponse:
         logger.debug(environ)
 
@@ -201,7 +263,9 @@ def make_app(router: Router) -> WSGIApp:
                 return [
                     b"<h1>Internal Server Error</h1>",
                     b"<pre>",
-                    bytes(tb, encoding="utf8") if Config.PRINT_STACKTRACE else b"",
+                    bytes(tb, encoding="utf8")
+                    if router.config.PRINT_STACKTRACE
+                    else b"",
                     b"</pre>",
                 ]
         else:
@@ -213,6 +277,9 @@ def make_app(router: Router) -> WSGIApp:
                 bytes(f"The {method} route at {path} does not exist.", encoding="utf8"),
             ]
 
+    app.router = router
+    app.config = router.config
+    app.context = router.context
     return app
 
 
@@ -279,13 +346,15 @@ class Client:
             return json.loads(self.body)
 
     @contextmanager
-    @staticmethod
-    def config(key: str, value: Any):
-        assert hasattr(Config, key)
-        backup = getattr(Config, key)
-        setattr(Config, key, value)
+    def config(self, key: str, value: Any):
+        """A context manager to temporarily set a config value."""
+        assert hasattr(self.app, "router")
+        assert self.app.router.config is not None
+        assert hasattr(self.app.router.config, key)
+        backup = getattr(self.app.router.config, key)
+        setattr(self.app.router.config, key, value)
         yield
-        setattr(Config, key, backup)
+        setattr(self.app.router.config, key, backup)
 
     def __init__(self, app: WSGIApp):
         self.app = app

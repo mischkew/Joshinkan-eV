@@ -62,6 +62,7 @@ def dummy_app() -> WSGIApp:
     def expect_params_route(request: Request) -> Response:
         return 200, request.form_data()
 
+    R.set_config(Config())
     return make_app(R)
 
 
@@ -179,11 +180,13 @@ def test_server_error_no_traceback(dummy_client):
 
 
 def test_server_error_with_traceback(dummy_client):
-    assert not Config.PRINT_STACKTRACE
-    with Client.config("PRINT_STACKTRACE", "1"):
-        assert Config.PRINT_STACKTRACE
+    config = dummy_client.app.config
+
+    assert not config.PRINT_STACKTRACE
+    with dummy_client.config("PRINT_STACKTRACE", True):
+        assert config.PRINT_STACKTRACE
         res = dummy_client.get("/crashing")
-    assert not Config.PRINT_STACKTRACE
+    assert not config.PRINT_STACKTRACE
     assert res.status == 500
     assert "Internal Server Error" in res.body
     assert "ValueError" in res.body

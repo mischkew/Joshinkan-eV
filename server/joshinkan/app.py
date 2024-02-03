@@ -10,17 +10,14 @@ def main():
     setup_logging(config.LOGLEVEL)
     logger = get_logger(__name__)
 
-    # NOTE(sven): This retrieves all global variables of the config module into a dict
-    all_configs = {
-        key: value
-        for key, value in getmembers(config, lambda x: not ismodule(x))
-        if not key.startswith("__")
-    }
-    logger.info(f"Env Configuration: {all_configs}")
+    from .config import Config
+
+    logger.info(f"Config: {config}")
 
     from .httpd import make_app
     from .routes import router
 
+    router.set_config(config)
     app = make_app(router)
     with make_server("0.0.0.0", 5000, app) as httpd:
         print("Serving HTTP on port 5000...")
