@@ -245,6 +245,18 @@ build/server/server: $(SWIFT_FILES)
 # Deployment
 #
 
+
+.PHONY: ssh
+ssh:
+	ssh ec2-user@3.70.140.207 # TODO: test.joshinkan.de
+
+.PHONY: upload
+upload:
+	./zip-pack.sh
+	scp joshinkan.zip ec2-user@3.70.140.207:~/
+	ssh ec2-user@3.70.140.207 sudo mv '~/joshinkan.zip' /opt
+	ssh ec2-user@3.70.140.207 < ./zip-unpack.sh
+
 .PHONY: deploy
 deploy:
 	gcloud app deploy --quiet

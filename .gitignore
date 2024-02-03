@@ -3,6 +3,7 @@ logs
 *.pem
 *.pid
 .env
+joshinkan.zip
 server/.swiftpm
 
 # ephemeral Make targets
