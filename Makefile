@@ -7,8 +7,8 @@ ifneq (,$(wildcard .env))
 	include .env
 endif
 
-ifndef SMTP_EMAIL
-$(error Variable SMTP_EMAIL is not set. Check .env or define environment variable)
+ifndef SMTP_USER
+$(error Variable SMTP_USER is not set. Check .env or define environment variable)
 endif
 ifndef SMTP_PASSWORD
 $(error Variable SMTP_PASSWORD is not set. Check .env or define environment variable)
@@ -30,47 +30,21 @@ endif
 
 .PHONY: clean
 clean:
-	swift package clean --package-path server
 	rm -rf ./build
 
 .PHONY: build
-build: build-frontend build-backend
+build: build-frontend install-backend
 
 .PHONY: watch
 watch:
-	@if [ "$$($(MAKE) status-backend)" = "backend not running" ]; then \
-		$(MAKE) start-backend --silent; \
-	fi
-	@if [ "$$($(MAKE) status-nginx)" = "nginx not running" ]; then \
-		$(MAKE) start-nginx --silent; \
-	fi
-
-	@echo "Starting to watch for frontend and backend changes."
-	@echo "Edit files and:"
-	@echo "  - the frontend will rebuild"
-	@echo "  - the backend will rebuild"
-	@echo "  - the nginx config will reload"
-	@echo "  - the backend fcgi server will restart"
-	@echo "... if required."
-
-	@while true; do \
-		$(MAKE) build-backend --question || \
-			$(MAKE) start-backend --silent || \
-			$(MAKE) start-backend --touch; \
-		$(MAKE) build-frontend --silent; \
-		$(MAKE) reload-nginx --silent; \
-		sleep 1; \
-	done
-
-.PHONY: start
-start: build start-backend start-nginx
+	@echo "Call `make watch-frontend` and `make watch-backend` in two separate shells."
 
 .PHONY: stop
-stop: stop-backend stop-nginx
+stop: stop-nginx
 
-# Shows whether a local frontend/ backend instance are already running
+# Shows whether a local backend instance are already running
 .PHONY: status
-status: status-backend status-nginx
+status: status-nginx
 
 .PHONE: test
 test: test-backend
@@ -111,7 +85,7 @@ stop-nginx:
 .PHONY: reload-nginx
 reload-nginx: .should-reload
 
-.should-reload: nginx.conf $(wildcard *.pem)
+.should-reload: nginx.tpl.conf .env $(wildcard *.pem)
 	@echo "reload nginx";
 	nginx -s reload -p ./ -c build/nginx.conf
 	@touch $@
@@ -124,17 +98,31 @@ status-nginx:
 		echo "nginx not running"; \
 	fi
 
-build/$(SSL_KEY): $(SSL_KEY)
-	cp $< $@
+.PHONY: certs
+dev-certs:
+	@if [ -f "localhost+2.pem" ] && [ -f "localhost+2-key.pem" ]; then \
+		echo "Development certificates already created. Exiting."; \
+		exit 1; \
+	fi
 
-build/$(SSL_CERT): $(SSL_CERT)
-	cp $< $@
+	@if [ ! "$$(command -v mkcert)" ]; then \
+	 	echo "mkcert is not installed. Refer to the README."; \
+	 	exit 1; \
+	fi
 
-build/mime.types: mime.types
-	cp $< $@
+	mkcert localhost 127.0.0.1 ::1
+	@if [ ! -f "localhost+2.pem" ] || [ ! -f "localhost+2-key.pem" ]; then \
+	 	echo "Unexpected mkcert local certificate names."; \
+	 	exit 1; \
+	fi
 
-build/nginx.conf: nginx.tpl.conf build/mime.types build/$(SSL_KEY) build/$(SSL_CERT)
-	cp $< $@
+build/nginx.conf: nginx.tpl.conf .env $(SSL_KEY) $(SSL_CERT) mime.types ./load-env.sh
+	mkdir -p build
+	cp $(SSL_KEY) build/
+	cp $(SSL_CERT) build/
+	cp mime.types build/
+	source ./load-env.sh .env && \
+  ./web/scripts/include.sh $< > $@
 
 .PHONY: logs-error
 logs-error:
@@ -158,88 +146,50 @@ build/web/%.html: \
 	@mkdir -p $$(dirname $@)
 	./web/scripts/include.sh $< > $@ || (rm $@ && exit 1)
 
+.PHONY: watch-frontend
+watch-frontend:
+	$(MAKE) build-frontend
+	@if [ "$$($(MAKE) status-nginx)" = "nginx not running" ]; then \
+		$(MAKE) start-nginx --silent; \
+	fi
+
+	@echo "Starting to watch for frontend changes."
+	@echo "Edit files and:"
+	@echo "  - the frontend will rebuild"
+	@echo "  - the nginx config will reload"
+	@echo "... if required."
+	@echo
+
+	@while true; do \
+		$(MAKE) build-frontend --silent; \
+		$(MAKE) reload-nginx --silent; \
+		sleep 1; \
+	done
+
 #
 # Backend
 #
 
+.PHONY: install-backend
+install-backend: build/install.log
+build/install.log: server/setup.py
+	@echo "Installing backend for development"
+	mkdir -p build
+	pip install -e 'server[dev]' | tee build/install.log
+
+.PHONY: watch-backend
+watch-backend: install-backend
+	@echo "Starting to watch for backend changes."
+	@echo "Edit files and:"
+	@echo "  - the backend will reload"
+	@echo "... if required."
+
+	source ./load-env.sh .env && \
+	joshinkand-dev
+
 .PHONY: test-backend
-test-backend:
-	cd server && USE_LINEBREAK=1 swift test
-
-.PHONY: build-backend
-build-backend: build/server/server
-
-
-ifdef SMTP_CC
-SMTP_CC_CMD=$(addprefix --cc ,$(SMTP_CC))
-endif
-ifdef SMTP_BCC
-SMTP_BCC_CMD=$(addprefix --bcc ,$(SMTP_BCC))
-endif
-ifdef SMTP_REPLY_TO
-SMTP_REPLY_TO_CMD=--reply-to $(SMTP_REPLY_TO)
-endif
-
-.PHONY: start-backend
-start-backend: build/server/server
-	$(MAKE) stop-backend
-	echo "Starting backend"
-	spawn-fcgi \
-    -d build/server \
-    -p 5000 \
-    -P build/fcgi.pid \
-    -- server \
-      --email $(SMTP_EMAIL) \
-      --password $(SMTP_PASSWORD) \
-			$(SMTP_CC_CMD) \
-      $(SMTP_BCC_CMD) \
-			$(SMTP_REPLY_TO_CMD) \
-      --domain $(DOMAIN)
-
-.PHONY: stop-backend
-stop-backend:
-	@if [ -f build/fcgi.pid ] && [ -n "$$(cat build/fcgi.pid)" ] ; then \
-		(kill $$(cat build/fcgi.pid) || echo "no such process") && \
-		rm build/fcgi.pid && \
-		echo "backend stopped"; \
-	else \
-		echo "backend not running"; \
-	fi
-
-.PHONY: status-backend
-status-backend:
-	@if [ -f build/fcgi.pid ]; then \
-		(ps -p $$(cat build/fcgi.pid) >& /dev/null && echo "backend running") || echo "backend not running"; \
-	else \
-		echo "backend not running"; \
-	fi
-
-# NOTE(sven): Install fcgi and spawn-fcgi to support the nginx connection to the
-# backend.
-ifeq ($(SYSTEM_NAME), Darwin)
-	@if [ ! -d $$(brew --prefix fcgi) ]; then \
-    brew install fcgi; \
-	fi
-	@if [ ! -d $$(brew --prefix spawn-fcgi) ]; then \
-    brew install spawn-fcgi; \
-	fi
-else
-  echo "Deps only installed for OSX" && exit 1
-endif
-
-SWIFT_FILES_CMD = find server -type f -not -path "*.build*" "(" -name "*.swift" -or -name "*.modulemap" -or -name "*.h" -or -name "*Package.resolved" ")"
-SWIFT_FILES = $(shell $(SWIFT_FILES_CMD))
-.PHONY: debug-build-dependencies
-debug-build-dependencies:
-	$(SWIFT_FILES_CMD)
-	@echo
-	@echo $(SWIFT_FILES)
-
-build/server/server: $(SWIFT_FILES)
-	@echo $^
-	mkdir -p build/server
-	swift build --package-path server
-	cp $$(swift build --package-path server --show-bin-path)/Joshinkan ./build/server/server
+test-backend: install-backend
+	cd "server" && pytest -x --ff -v
 
 #
 # Deployment

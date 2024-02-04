@@ -17,8 +17,7 @@
 Setup the local SSL certificate chain as the development server runs in https as well. We use `mkcert` to generate a CA for your own developer certificates. If you already use `mkcert` for other projects you can skip step 1.
 
 - Step 1 - Install CA: `mkcert -install`
-- Step 2 - Generate developer SSL certificates: `mkcert localhost 127.0.0.1 ::1`
-  Two files should be generated: `localhost+2.pem` and `localhost+2-key.pem`. If the filenames differ, rename the files.
+- Step 2 - Generate developer SSL certificates: `make dev-certs`
 - Step 3 - Copy `template.env` to `.env` and setup the variables.
 
 **Usage**

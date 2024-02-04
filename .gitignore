@@ -9,5 +9,10 @@ server/.swiftpm
 # ephemeral Make targets
 .should-reload
 
+# certificates
+localhost+2.pem
+localhost+2-key.pem
+
 # python
 .python-version
+server/install.log
