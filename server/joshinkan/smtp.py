@@ -1,19 +1,8 @@
-from .config import Config
-import smtplib
+from smtplib import SMTP
 import re
 from dataclasses import dataclass
 from typing import Optional
-
-
-_smtp = None
-
-
-def smtp() -> smtplib.SMTP:
-    global _smtp
-    if _smtp is None:
-        _smtp = smtplib.SMTP(Config.SMTP_HOST, Config.SMTP_PORT)
-        _smtp.login(Config.SMPT_USER, Config.SMPT_PASSWORD)
-    return _smtp
+from email.message import EmailMessage
 
 
 @dataclass
@@ -25,19 +14,19 @@ class EmailUser:
         INVALID_EMAIL = "INVALID_EMAIL"
         UNEXPECTED_FORMAT = "UNEXPECTED_FORMAT"
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.name:
             return f"{self.name} <{self.email}>"
         else:
             return f"<{self.email}>"
 
     @staticmethod
-    def is_valid_email(email):
+    def is_valid_email(email: str) -> bool:
         email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.fullmatch(email_regex, email) is not None
 
     @classmethod
-    def from_description(cls, description):
+    def from_description(cls, description: str) -> "EmailUser":
         user_regex = r"^(?P<name>[^<>]+)?(\s*<(?P<email>.+)>\s*)?"
         match = re.fullmatch(user_regex, description)
 
@@ -63,3 +52,19 @@ class EmailUser:
             raise cls.ParsingError(cls.ParsingError.INVALID_EMAIL)
 
         return cls(name=name, email=email)
+
+
+class Mailer:
+    def __init__(self, host: str, port: int, user: EmailUser, password: str):
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+
+    def send(self, message: EmailMessage, to_addrs: list[EmailUser]):
+        emails = [addr.email for addr in to_addrs]
+        smtp = SMTP(self.host, self.port)
+        smtp.starttls()
+        smtp.login(self.user.email, self.password)
+        smtp.send_message(message, to_addrs=emails)
+        smtp.quit()

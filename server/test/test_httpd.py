@@ -62,7 +62,7 @@ def dummy_app() -> WSGIApp:
     def expect_params_route(request: Request) -> Response:
         return 200, request.form_data()
 
-    R.set_config(Config())
+    R.set_config(Config(SMTP_USER="test@example.com", SMTP_PASSWORD="password"))
     return make_app(R)
 
 

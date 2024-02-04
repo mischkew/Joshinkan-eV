@@ -23,6 +23,13 @@ def test_parse_description_text_after_email():
         EmailUser.from_description("John Smith <john@example.com> shouldnotbehere")
 
 
+def test_parse_description_empty():
+    with pytest.raises(
+        EmailUser.ParsingError, match=str(EmailUser.ParsingError.UNEXPECTED_FORMAT)
+    ):
+        EmailUser.from_description("")
+
+
 def test_parse_description_carets_in_name():
     with pytest.raises(
         EmailUser.ParsingError, match=str(EmailUser.ParsingError.INVALID_EMAIL)

@@ -7,7 +7,7 @@ from .httpd import Router, Response, expect_json, Request, Status
 from .validation import Schema, DictOf, Values, OptionalKey, ListOf
 from .logger import get_logger
 from joshinkan import multipart
-from smtplib import SMTP
+from .smtp import SMTP, EmailUser, Mailer
 
 logger = get_logger(__name__)
 router = Router()
@@ -41,28 +41,41 @@ CHILDREN_SCHEMA = Schema(
 
 @dataclass
 class AppContext:
-    smtp: SMTP
+    mailer: Mailer
+
+    @staticmethod
+    def from_config(config: Config) -> "AppContext":
+        mailer = Mailer(
+            host=config.SMTP_HOST,
+            port=config.SMTP_PORT,
+            user=config.SMTP_USER,
+            password=config.SMTP_PASSWORD,
+        )
+        return AppContext(mailer=mailer)
 
 
-def host_domain():
-    scheme = os.getenv("X_SCHEME") or "http"
-    host = os.getenv("HTTP_HOST")
-
-    if host is None:
-        return None
-
-    return f"{scheme}://{host}"
+def host_domain(request: Request) -> str:
+    return request.environ["HTTP_ORIGIN"]
 
 
-@router.get("/trial-registration")
+@router.post("/trial-registration")
 @router.with_context()
 @router.with_config()
-def register(request: Request, context: AppContext, config: Config) -> Response:
+def trial_registration(
+    request: Request, context: AppContext, config: Config
+) -> Response:
+    domain = host_domain(request)
     form_data = request.form_data()
     adult_valid, adult_error = ADULT_SCHEMA.validate(form_data)
     child_valid, child_error = CHILDREN_SCHEMA.validate(form_data)
 
+    first_name = form_data["first_name"]
+    last_name = form_data["last_name"]
+    email = form_data["email"]
+    phone = form_data["phone"]
+
     if child_valid:
+        # TODO(sven): Fix child parsing and email sending
 
         def make_block(index: int) -> str:
             first_name = form_data["child_first_name"][index]
@@ -78,11 +91,6 @@ def register(request: Request, context: AppContext, config: Config) -> Response:
         blocks = "\n<br/>".join(
             make_block(i) for i in range(len(form_data["child_first_name"]))
         )
-
-        first_name = form_data["first_name"]
-        last_name = form_data["last_name"]
-        email = form_data["email"]
-        phone = form_data["phone"]
 
         message = EmailMessage()
         message.set_content(
@@ -100,10 +108,10 @@ def register(request: Request, context: AppContext, config: Config) -> Response:
 
         message["Subject"] = "Neuanmeldung zum Probetraining für Kinder ({len(blocks)})"
         message["From"] = config.SMTP_USER
-        message["To"] = config.SMTP_REPLY_TO
+        message["To"] = config.SMTP_REPLY_TO or config.SMTP_USER
         message["Cc"] = config.SMTP_CC
         message["Content-Type"] = "text/html; charset=utf-8"
-        context.smtp.send_message(
+        context.mailer.send(
             message, to_addrs=[config.SMTP_USER] + config.SMTP_CC + config.SMTP_BCC
         )
 
@@ -123,7 +131,7 @@ def register(request: Request, context: AppContext, config: Config) -> Response:
             <br/>
             Einer unserer Trainer wird sich in Kürze bei euch melden und die Anmeldung mit \
             einem Termin zum ersten Training bestätigen. Falls ihr in der Zwischenzeit \
-            weitere Fragen habt, findet ihr Infos <a href="{host_domain() or config.DOMAIN}/kontakt">hier</a>.<br/>
+            weitere Fragen habt, findet ihr Infos <a href="{domain}/kontakt">hier</a>.<br/>
             <br/>
             Liebe Grüße,<br/>
             Das Joshinkan Team<br/>
@@ -134,16 +142,20 @@ def register(request: Request, context: AppContext, config: Config) -> Response:
         ack_message["From"] = SMTP_USER
         ack_message["To"] = user_email
         ack_message["Cc"] = SMTP_CC
-        ack_message["Reply-To"] = SMTP_REPLY_TO
+        ack_message["Reply-To"] = config.SMTP_REPLY_TO or config.SMTP_USER
         ack_message["Content-Type"] = "text/html; charset=utf-8"
-        sender.send_message(ack_message, to_addrs=[user_email] + SMTP_CC + SMTP_BCC)
+        context.mailer.send_message(
+            ack_message, to_addrs=[user_email] + SMTP_CC + SMTP_BCC
+        )
 
         return Status.OK, ["message", "Email sent."]
     elif adult_valid:
+        age = form_data["age"]
+
         message = EmailMessage()
-        message["From"] = config.SMTP_USER
-        message["To"] = config.SMTP_REPLY_TO
-        message["Cc"] = config.SMTP_CC
+        message["From"] = str(config.SMTP_USER)
+        message["To"] = str(config.SMTP_REPLY_TO or config.SMTP_USER)
+        message["Cc"] = [str(e) for e in config.SMTP_CC]
         message["Subject"] = "Anmeldung zum Probetraining: Erwachsene"
         message.set_content(
             f"""
@@ -156,15 +168,16 @@ def register(request: Request, context: AppContext, config: Config) -> Response:
         """,
             subtype="html",
         )
-        context.smtp.send_message(
+        context.mailer.send(
             message, to_addrs=[config.SMTP_USER] + config.SMTP_CC + config.SMTP_BCC
         )
 
-        user_email = str(EmailUser(name=f"{first_name} {last_name}", email=email))
+        user_email = EmailUser(name=f"{first_name} {last_name}", email=email)
         ack_message = EmailMessage()
-        ack_message["From"] = config.SMTP_USER
-        ack_message["To"] = user_email
-        ack_message["Cc"] = config.SMTP_CC
+        ack_message["From"] = str(config.SMTP_USER)
+        ack_message["To"] = str(user_email)
+        ack_message["Cc"] = [str(e) for e in config.SMTP_CC]
+        ack_message["Reply-To"] = str(config.SMTP_REPLY_TO or config.SMTP_USER)
         ack_message["Subject"] = "Joshinkan Werder Karate - Anmeldung zum Probetraining"
         ack_message.set_content(
             f"""
@@ -174,18 +187,17 @@ def register(request: Request, context: AppContext, config: Config) -> Response:
             <br/>
             Einer unserer Trainer wird sich in Kürze bei dir melden und die Anmeldung mit
             einem Termin zum ersten Training bestätigen. Falls du in der Zwischenzeit
-            weitere Fragen hast, findest du Infos <a href="{host_domain() or config.DOMAIN}/kontakt">hier</a>.<br/>
+            weitere Fragen hast, findest du Infos <a href="{domain}/kontakt">hier</a>.<br/>
             <br/>
             Liebe Grüße,<br/>
             Das Joshinkan Team<br/>
         """,
             subtype="html",
         )
-        context.smtp.send_message(
+        context.mailer.send(
             ack_message, to_addrs=[user_email] + config.SMTP_CC + config.SMTP_BCC
         )
-
-        return Status.OK, ["message", "Email sent."]
+        return Status.OK, {"message": "Email sent."}
     else:
         if (
             "child_first_name" in form_data
