@@ -3,9 +3,15 @@ all: watch
 
 SYSTEM_NAME = $(shell uname -s)
 
-ifneq (,$(wildcard .env))
-	include .env
+ifndef ENVIRONMENT
+ENVIRONMENT=local
 endif
+
+ifneq ($(ENVIRONMENT),$(filter $(ENVIRONMENT),production testing local current-deployment))
+$(error Variable ENVIRONMENT must be either production, testing, local or current-deployment)
+endif
+
+include .env.$(ENVIRONMENT)
 
 ifndef SMTP_USER
 $(error Variable SMTP_USER is not set. Check .env or define environment variable)
@@ -22,6 +28,22 @@ endif
 ifndef SSL_KEY
 $(error Variable SSL_KEY is not set. Check .env or define environment variable)
 endif
+ifndef BUILD_DIR
+$(error Variable BUILD_DIR is not set. Check .env or define environment variable)
+endif
+ifndef LOGS_DIR
+$(error Variable LOGS_DIR is not set. Check .env or define environment variable)
+endif
+ifndef NGINX_PID_PATH
+$(error Variable NGINX_PID_PATH is not set. Check .env or define environment variable)
+endif
+
+# Checks if the currently used environment is local. Otherwise exits.
+require-local:
+	@if [ "${ENVIRONMENT}" != "local" ]; then \
+	  echo "Environment 'local' is required. The current environment is '${ENVIRONMENT}'."; \
+	  exit 1; \
+	fi
 
 
 #
@@ -30,24 +52,24 @@ endif
 
 .PHONY: clean
 clean:
-	rm -rf ./build
+	rm -rf $(BUILD_DIR)
 
 .PHONY: build
 build: build-frontend install-backend
 
 .PHONY: watch
-watch:
+watch: | require-local
 	@echo "Call `make watch-frontend` and `make watch-backend` in two separate shells."
 
-.PHONY: stop
+.PHONY: stop | require-local
 stop: stop-nginx
 
 # Shows whether a local backend instance are already running
 .PHONY: status
-status: status-nginx
+status: status-nginx | require-local
 
 .PHONE: test
-test: test-backend
+test: test-backend | require-local
 
 #
 # Frontend
@@ -67,39 +89,39 @@ endif
 
 .PHONY: assets
 assets:
-	mkdir -p build/web
-	cp -r web/images web/stylesheets web/javascripts web/fonts build/web
+	mkdir -p $(BUILD_DIR)/web
+	cp -r web/images web/stylesheets web/javascripts web/fonts $(BUILD_DIR)/web
 
 .PHONY: start-nginx
-start-nginx:
+start-nginx: | require-local
 	$(MAKE) stop-nginx
 	echo "Starting nginx"
 	mkdir -p logs
-	nginx -p ./ -c build/nginx.conf
+	nginx -p ./ -c $(BUILD_DIR)/nginx.conf
 
 .PHONY: stop-nginx
-stop-nginx:
-	@(nginx -s stop -p ./build -c nginx.conf >& /dev/null && echo "nginx stopped") || \
+stop-nginx: | require-local
+	@(nginx -s stop -p $(BUILD_DIR) -c nginx.conf >& /dev/null && echo "nginx stopped") || \
 		echo "nginx not running"
 
 .PHONY: reload-nginx
-reload-nginx: .should-reload
+reload-nginx: .should-reload | require-local
 
-.should-reload: nginx.tpl.conf .env $(wildcard *.pem)
+.should-reload: nginx.tpl.conf .env.$(ENVIRONMENT) $(wildcard *.pem) | require-local
 	@echo "reload nginx";
-	nginx -s reload -p ./ -c build/nginx.conf
+	nginx -s reload -p ./ -c $(BUILD_DIR)/nginx.conf
 	@touch $@
 
 .PHONY: status-nginx
-status-nginx:
-	@if [ -f build/nginx.pid ]; then \
-		(ps -p $$(cat build/nginx.pid) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
+status-nginx: | require-local
+	@if [ -f $(NGINX_PID_PATH) ]; then \
+		(ps -p $$(cat $(NGINX_PID_PATH)) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
 	else \
 		echo "nginx not running"; \
 	fi
 
 .PHONY: certs
-dev-certs:
+dev-certs: | require-local
 	@if [ -f "localhost+2.pem" ] && [ -f "localhost+2-key.pem" ]; then \
 		echo "Development certificates already created. Exiting."; \
 		exit 1; \
@@ -116,26 +138,25 @@ dev-certs:
 	 	exit 1; \
 	fi
 
-build/nginx.conf: nginx.tpl.conf .env $(SSL_KEY) $(SSL_CERT) mime.types ./load-env.sh
-	mkdir -p build
-	cp $(SSL_KEY) build/
-	cp $(SSL_CERT) build/
-	cp mime.types build/
-	source ./load-env.sh .env && \
-  ./web/scripts/include.sh $< > $@
+$(BUILD_DIR)/nginx.conf: nginx.tpl.conf .env.$(ENVIRONMENT) mime.types ./load-env.sh
+	mkdir -p $(BUILD_DIR)
+  # NOTE(sven): We force usage of bash here as on different oses Make uses
+  # different shells which don't support a full feature set
+	/bin/bash -c \
+		"ENVIRONMENT=$(ENVIRONMENT) source ./load-env.sh; ./web/scripts/include.sh $< > $@"
 
-.PHONY: logs-error
-logs-error:
-	tail -f logs/error.log
-
-.PHONY: logs-access
-logs-access:
-	tail -f logs/access.log
+$(BUILD_DIR)/nginx-host.conf: nginx-host.tpl.conf .env.$(ENVIRONMENT) ./load-env.sh
+	mkdir -p $(BUILD_DIR)
+	cp mime.types $(BUILD_DIR)
+  # NOTE(sven): We force usage of bash here as on different oses Make uses
+  # different shells which don't support a full feature set
+	/bin/bash -c \
+		"ENVIRONMENT=$(ENVIRONMENT) source ./load-env.sh; ./web/scripts/include.sh $< > $@"
 
 .PHONY: build-frontend
-build-frontend: assets $(addprefix build/,$(wildcard web/*.html)) build/nginx.conf
+build-frontend: assets $(addprefix $(BUILD_DIR)/,$(wildcard web/*.html)) $(BUILD_DIR)/nginx.conf $(BUILD_DIR)/nginx-host.conf
 
-build/web/%.html: \
+$(BUILD_DIR)/web/%.html: \
 	web/%.html \
 	$(wildcard web/templates/*.html) \
 	$(wildcard web/components/*.html) \
@@ -147,7 +168,7 @@ build/web/%.html: \
 	./web/scripts/include.sh $< > $@ || (rm $@ && exit 1)
 
 .PHONY: watch-frontend
-watch-frontend:
+watch-frontend: | require-local
 	$(MAKE) build-frontend
 	@if [ "$$($(MAKE) status-nginx)" = "nginx not running" ]; then \
 		$(MAKE) start-nginx --silent; \
@@ -171,42 +192,73 @@ watch-frontend:
 #
 
 .PHONY: install-backend
-install-backend: build/install.log
-build/install.log: server/setup.py
-	@echo "Installing backend for development"
-	mkdir -p build
-	pip install -e 'server[dev]' | tee build/install.log
+install-backend: $(BUILD_DIR)/install.log
+$(BUILD_DIR)/install.log: server/setup.py
+	@echo "Installing backend"
+	mkdir -p $(BUILD_DIR)
+	pip install -e 'server[dev]' | tee $(BUILD_DIR)/install.log
 
 .PHONY: watch-backend
-watch-backend: install-backend
+watch-backend: install-backend | require-local
 	@echo "Starting to watch for backend changes."
 	@echo "Edit files and:"
 	@echo "  - the backend will reload"
 	@echo "... if required."
 
-	source ./load-env.sh .env && \
+	source ./load-env.sh .env.$(ENVIRONMENT) && \
 	joshinkand-dev
 
 .PHONY: test-backend
-test-backend: install-backend
+test-backend: install-backend | require-local
 	cd "server" && pytest -x --ff -v
 
 #
 # Deployment
 #
 
+# -tt: Force pseudo-terminal allocation. This can be used to execute arbitrary
+# -screen-based programs on a remote machine.
+run_remote = ssh -tt ubuntu@$(DOMAIN) $1
+
+print-env:
+	@echo;
+	@echo "Using environment ${ENVIRONMENT}";
+	@echo "Domain: $(DOMAIN)";
+	@echo;
+
+# Solution: https://stackoverflow.com/a/47839479/3154357
+request-confirmation: print-env
+	@echo "Do you want to continue? [y/N] " && read ans && [ $${ans:-N} = y ]
+	@echo
+
 
 .PHONY: ssh
 ssh:
-	ssh ec2-user@3.70.140.207 # TODO: test.joshinkan.de
+	ssh ubuntu@$(DOMAIN)
 
 .PHONY: upload
-upload:
-	./zip-pack.sh
-	scp joshinkan.zip ec2-user@3.70.140.207:~/
-	ssh ec2-user@3.70.140.207 sudo mv '~/joshinkan.zip' /opt
-	ssh ec2-user@3.70.140.207 < ./zip-unpack.sh
+upload: | request-confirmation
+	./zip-pack.sh joshinkan.zip $(ENVIRONMENT)
+	scp joshinkan.zip zip-unpack.sh ubuntu@$(DOMAIN):~/
+	$(call run_remote, "./zip-unpack.sh joshinkan.zip")
 
+.PHONY: bootstrap
+bootstrap: | request-confirmation
+	$(call run_remote, "cd joshinkan && ./bootstrap.sh")
+
+# gcloud app deploy --quiet
 .PHONY: deploy
-deploy:
-	gcloud app deploy --quiet
+deploy: | request-confirmation
+	$(call run_remote, "cd joshinkan && ./deploy.sh")
+
+.PHONY: log
+log:
+	$(call run_remote, "systemctl status nginx joshinkan")
+
+.PHONY: log-nginx
+log-nginx:
+	$(call run_remote, "journalctl -xeu nginx")
+
+.PHONY: log-server
+log-server:
+	$(call run_remote, "journalctl -xeu joshinkan")

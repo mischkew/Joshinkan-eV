@@ -3,6 +3,7 @@ logs
 *.pem
 *.pid
 .env
+.env*
 joshinkan.zip
 server/.swiftpm
 

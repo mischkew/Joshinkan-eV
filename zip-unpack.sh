@@ -4,12 +4,21 @@
 # stdout. Useful for debugging when running the bootstrap script via the make
 # pipeline.
 set -ex
+USER=ubuntu
 
-if [ ! -f "/opt/joshinkan.zip" ]; then
-    echo "/opt/joshinkan.zip does not exist. Make sure it is uploaded correctly before executing this script."
+FILENAME="${1:-pack.zip}"
+DIRECTORY_NAME="${FILENAME%.*}"
+
+if [ ! -f "$FILENAME" ]; then
+    echo "$FILENAME does not exist. Make sure it is uploaded correctly before executing this script."
     exit 1
 fi
 
-# NOTE(sven): -o overwrite files, -d export directory
-sudo rm -rf /opt/joshinkan
-sudo unzip -o /opt/joshinkan.zip -d /opt/joshinkan/
+if [ -z "$(command -v unzip)" ]; then
+    sudo apt-get update
+    sudo apt-get install --yes unzip
+fi
+
+rm -rf $DIRECTORY_NAME
+# NOTE(sven): -d export directory
+unzip $FILENAME -d "$DIRECTORY_NAME"

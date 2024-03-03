@@ -3,7 +3,7 @@
 set -e
 
 # Load the .env file and export its variables
-ENV_FILE="${1:-.env}"
+ENV_FILE="${1:-.env.$ENVIRONMENT}"
 if [ ! -f "$ENV_FILE" ]; then
   echo "No .env file found at $ENV_FILE"
   exit 1
