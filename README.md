@@ -8,7 +8,7 @@
 - make
 - sed
 - realpath
-- swift 5.8
+- python 3.10
 - mkcert (`brew install mkcert`) 
 - awscli
 
