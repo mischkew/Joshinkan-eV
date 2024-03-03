@@ -194,9 +194,14 @@ watch-frontend: | require-local
 .PHONY: install-backend
 install-backend: $(BUILD_DIR)/install.log
 $(BUILD_DIR)/install.log: server/setup.py
-	@echo "Installing backend"
 	mkdir -p $(BUILD_DIR)
+ifeq ($(ENVIRONMENT),current-deployment)
+	@echo "Installing backend"
+	pip install './server' | tee $(BUILD_DIR)/install.log
+else
+	@echo "Installing backend for development"
 	pip install -e 'server[dev]' | tee $(BUILD_DIR)/install.log
+endif
 
 .PHONY: watch-backend
 watch-backend: install-backend | require-local
