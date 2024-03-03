@@ -10,6 +10,7 @@
 - realpath
 - swift 5.8
 - mkcert (`brew install mkcert`) 
+- awscli
 
 **Installation**
 
@@ -17,7 +18,7 @@ Setup the local SSL certificate chain as the development server runs in https as
 
 - Step 1 - Install CA: `mkcert -install`
 - Step 2 - Generate developer SSL certificates: `make dev-certs`
-- Step 3 - Copy `template.env` to `.env` and setup the variables.
+- Step 3 - Copy `template.env` to `.env.local` and setup the variables.
 
 **Usage**
 
@@ -42,7 +43,9 @@ You can deploy to the following environments:
 - `testing`: test.joshinkan.de
 - `production`: joshinkan.de
 
-An SSH private key is required to access the servers.
+Pre-configured environent files can be downloaded via `make fetch-environments`. This requires a configured aws cli access. 
+
+An SSH private key is required to deploy to the servers.
 
 Specify the target environment via an environment variable, e.g
 
@@ -54,3 +57,7 @@ ENVIRONMENt=testing make log # show a summary of frontend and backend logs
 ``` 
 
 We are using a fixed ip address for the servers. Adjust the DNS records when adding new instances.
+
+There are two special environments:
+- `local`: used for localhost development
+- `current-deployment`: used on the server. The zip-pack.sh script copies the environment variables of the target environment to a `.env.current-deployment` file and only this environment file will be upoladed to the server.

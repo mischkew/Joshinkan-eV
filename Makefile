@@ -34,9 +34,6 @@ endif
 ifndef LOGS_DIR
 $(error Variable LOGS_DIR is not set. Check .env or define environment variable)
 endif
-ifndef NGINX_PID_PATH
-$(error Variable NGINX_PID_PATH is not set. Check .env or define environment variable)
-endif
 
 # Checks if the currently used environment is local. Otherwise exits.
 require-local:
@@ -114,13 +111,13 @@ reload-nginx: .should-reload | require-local
 
 .PHONY: status-nginx
 status-nginx: | require-local
-	@if [ -f $(NGINX_PID_PATH) ]; then \
-		(ps -p $$(cat $(NGINX_PID_PATH)) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
+	@if [ -f $(BUILD_DIR)/nginx.pid ]; then \
+		(ps -p $$(cat $(BUILD_DIR)/nginx.pid) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
 	else \
 		echo "nginx not running"; \
 	fi
 
-.PHONY: certs
+.PHONY: dev-certs
 dev-certs: | require-local
 	@if [ -f "localhost+2.pem" ] && [ -f "localhost+2-key.pem" ]; then \
 		echo "Development certificates already created. Exiting."; \
@@ -137,6 +134,18 @@ dev-certs: | require-local
 	 	echo "Unexpected mkcert local certificate names."; \
 	 	exit 1; \
 	fi
+
+.PHONY: fetch-environments
+fetch-environments: | require-local
+	aws s3 cp s3://joshinkan/.env.local ./
+	aws s3 cp s3://joshinkan/.env.testing ./
+	aws s3 cp s3://joshinkan/.env.production ./
+
+.PHONY: store-environments
+store-environments: | require-local
+	aws s3 cp .env.local s3://joshinkan/
+	aws s3 cp .env.testing s3://joshinkan/
+	aws s3 cp .env.production s3://joshinkan/
 
 $(BUILD_DIR)/nginx.conf: nginx.tpl.conf .env.$(ENVIRONMENT) mime.types ./load-env.sh
 	mkdir -p $(BUILD_DIR)
