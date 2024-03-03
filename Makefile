@@ -117,7 +117,7 @@ status-nginx: | require-local
 		echo "nginx not running"; \
 	fi
 
-.PHONY: certs
+.PHONY: dev-certs
 dev-certs: | require-local
 	@if [ -f "localhost+2.pem" ] && [ -f "localhost+2-key.pem" ]; then \
 		echo "Development certificates already created. Exiting."; \
@@ -134,6 +134,18 @@ dev-certs: | require-local
 	 	echo "Unexpected mkcert local certificate names."; \
 	 	exit 1; \
 	fi
+
+.PHONY: fetch-environments
+fetch-environments: | require-local
+	aws s3 cp s3://joshinkan/.env.local ./
+	aws s3 cp s3://joshinkan/.env.testing ./
+	aws s3 cp s3://joshinkan/.env.production ./
+
+.PHONY: store-environments
+store-environments: | require-local
+	aws s3 cp .env.local s3://joshinkan/
+	aws s3 cp .env.testing s3://joshinkan/
+	aws s3 cp .env.production s3://joshinkan/
 
 $(BUILD_DIR)/nginx.conf: nginx.tpl.conf .env.$(ENVIRONMENT) mime.types ./load-env.sh
 	mkdir -p $(BUILD_DIR)
