@@ -1,5 +1,0 @@
-module libcurl [system] {
-    header "curl.h"
-    link "curl"
-    export *
-}
