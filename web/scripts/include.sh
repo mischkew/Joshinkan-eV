@@ -44,7 +44,6 @@ fi
 # string, then execute the shell command within and finally remove the new line
 # and the marking string again. This is required because the SED regex can't
 # make multiple shell command executions per line.
-# TODO: special marking not correclty removed in final website
 $SED -Ee 's:\{\{([^\{\}]*)\}\}:__SPECIAL_MARKING__\n&\n__SPECIAL_MARKING__:g' $(basename $1) \
   | $SED -Ee 's:\{\{([^\{\}]*)\}\}:\1:e' 2>"/tmp/build-err_$(basename $1).log" \
   | $SED -z -Ee 's:__SPECIAL_MARKING__\n|\n__SPECIAL_MARKING__::g'
