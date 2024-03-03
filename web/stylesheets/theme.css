@@ -32,9 +32,11 @@
   --color-link: #07c;
   --color-emphasis: var(--color-orange);
   --color-emphasis-background: #0881;
+  --color-background-red: #ffdbdd;
 
   --color-contrast: #fbfbfb;
   --color-background-contrast: rgba(0,0,0,0.5);
+  --color-background-much-contrast: rgba(0,0,0,0.8);
 
 }
 
@@ -114,7 +116,6 @@ a[href^='#'] {
   text-decoration: none;
 }
 a:hover,
-button:not([disabled]):hover,
 summary:hover {
   filter: brightness(108%);
   color: var(--color-emphasis);
@@ -174,11 +175,6 @@ svg {
   object-fit: cover;
 }
 
-/* forms */
-input {
-  width: 100%;
-}
-
 /* misc */
 hr {
   border: 0;
@@ -208,6 +204,10 @@ button {
   font-size: 85%;
   letter-spacing: 0.1em;
 }
+button:hover {
+  filter: brightness(108%);
+}
+
 button[disabled] {
   color: var(--color-dark);
   border-color: var(--color-medium);

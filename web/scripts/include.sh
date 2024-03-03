@@ -40,11 +40,14 @@ if [ -z "$(which $SED)" ]; then
   exit 1
 fi
 
-# Find all substitution commands and split them on a new line
-# and then execute the shell command within
-$SED -Ee 's:\{\{([^\{\}]*)\}\}:\n&\n:g' $(basename $1) \
-      | $SED -Ee 's:\{\{([^\{\}]*)\}\}:\1:e' \
-               2>"/tmp/build-err_$(basename $1).log"
+# Find all substitution commands and split them on a new line with a marking
+# string, then execute the shell command within and finally remove the new line
+# and the marking string again. This is required because the SED regex can't
+# make multiple shell command executions per line.
+$SED -Ee 's:\{\{([^\{\}]*)\}\}:__SPECIAL_MARKING__\n&\n__SPECIAL_MARKING__:g' $(basename $1) \
+  | $SED -Ee 's:\{\{([^\{\}]*)\}\}:\1:e' 2>"/tmp/build-err_$(basename $1).log" \
+  | $SED -z -Ee 's:__SPECIAL_MARKING__\n|\n__SPECIAL_MARKING__::g'
+
 
 if [ -s "/tmp/build-err_$(basename $1).log" ]; then
   echo "Include errors for $1:";

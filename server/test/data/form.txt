@@ -1,0 +1,14 @@
+
+------WebKitFormBoundaryiB5iskbmcAfH1zPo
+Content-Disposition: form-data; name="foo[]"
+
+1
+------WebKitFormBoundaryiB5iskbmcAfH1zPo
+Content-Disposition: form-data; name="foo[]"
+
+2
+------WebKitFormBoundaryiB5iskbmcAfH1zPo
+Content-Disposition: form-data; name="foo[]"
+
+3
+------WebKitFormBoundaryiB5iskbmcAfH1zPo--
