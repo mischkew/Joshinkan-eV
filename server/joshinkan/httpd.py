@@ -8,7 +8,7 @@ from functools import partialmethod, partial
 import traceback
 import json
 import sys
-from wsgiref.util import setup_testing_defaults
+from wsgiref.util import setup_testing_defaults, guess_scheme
 from io import BytesIO
 
 from .config import Config
@@ -399,6 +399,9 @@ class Client:
         # method tries to do some guessing based on environment values we have
         # provided, so we call it last.
         setup_testing_defaults(environ)
+        environ.setdefault(
+            "HTTP_ORIGIN", f'{guess_scheme(environ)}://{environ["SERVER_NAME"]}'
+        )
 
         status = None
         headers = None

@@ -1,18 +1,31 @@
+from dataclasses import dataclass
+import textwrap
 import pytest
 
 # from your_module import Client, ServerContext, User, SMTP
 from joshinkan.config import Config
 from joshinkan.routes import AppContext, router
 from joshinkan.httpd import make_app, Client
+from joshinkan.smtp import Mailer, EmailUser
 from unittest.mock import Mock
-from smtplib import SMTP
 
 
 @pytest.fixture
 def client():
-    config = Config()
-    smtp = Mock(spec=SMTP)
-    context = AppContext(smtp=smtp)
+    config = Config(
+        SMTP_USER=EmailUser.from_description("sender@example.com"),
+        SMTP_CC=[
+            EmailUser.from_description("cc@example.com"),
+            EmailUser.from_description("cc2@example.com"),
+        ],
+        SMTP_BCC=[
+            EmailUser.from_description("bcc@example.com"),
+            EmailUser.from_description("bcc2@example.com"),
+        ],
+        SMTP_PASSWORD="password",
+    )
+    mailer = Mock(spec=Mailer)
+    context = AppContext(mailer=mailer)
 
     router.set_config(config)
     router.set_context(context)
@@ -21,137 +34,310 @@ def client():
     return Client(app)
 
 
-def test_register_adult(client):
+@dataclass
+class RequestData:
+    headers: dict
+    body: str
+
+
+@pytest.fixture
+def adult_registration() -> RequestData:
+    return RequestData(
+        headers={
+            "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryiB5iskbmcAfH1zPo",
+            "Content-Length": "618",
+        },
+        body=textwrap.dedent(
+            """\
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="first_name"
+
+            sven
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="last_name"
+
+            mkw
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="email"
+
+            sven.mkw@gmail.com
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="phone"
+
+            123456789
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="age"
+
+            23
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="privacy"
+
+            on
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo--
+            """
+        ),
+    )
+
+
+@pytest.fixture
+def register_no_privacy() -> RequestData:
+    return RequestData(
+        headers={
+            "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryiB5iskbmcAfH1zPo",
+            "Content-Length": "619",
+        },
+        body=textwrap.dedent(
+            """\
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="first_name"
+
+            sven
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="last_name"
+
+            mkw
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="email"
+
+            sven.mkw@gmail.com
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="phone"
+
+            123456789
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="age"
+
+            23
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo
+            Content-Disposition: form-data; name="privacy"
+
+            off
+            ------WebKitFormBoundaryiB5iskbmcAfH1zPo--
+            """
+        ),
+    )
+
+
+@pytest.fixture
+def child_registration() -> RequestData:
+    return RequestData(
+        headers={
+            "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundary8uvuEcsk7hsemph9",
+            "Content-Length": "1010",
+        },
+        body=textwrap.dedent(
+            """\
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="child_first_name[]"
+
+            Boi
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="child_last_name[]"
+
+            Fam
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="child_age[]"
+
+            17
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="first_name"
+
+            Dad
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="last_name"
+
+            Fam
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="email"
+
+            fam@mail.com
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="phone"
+
+            04912847
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="age"
+
+
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="parents_consent"
+
+            on
+            ------WebKitFormBoundary8uvuEcsk7hsemph9
+            Content-Disposition: form-data; name="privacy"
+
+            on
+            ------WebKitFormBoundary8uvuEcsk7hsemph9--
+            """
+        ),
+    )
+
+
+@pytest.fixture
+def children_registration() -> RequestData:
+    return RequestData(
+        headers={
+            "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryJBxGtknRPIBvH5oj",
+            "Content-Length": "1316",
+        },
+        body=textwrap.dedent(
+            """\
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="child_first_name[]"
+
+            Boi
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="child_last_name[]"
+
+            Fam
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="child_age[]"
+
+            17
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="child_first_name[]"
+
+            Girl
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="child_last_name[]"
+
+            Fam
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="child_age[]"
+
+            16
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="first_name"
+
+            Dad
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="last_name"
+
+            Fam
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="email"
+
+            fam@mail.com
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="phone"
+
+            049127495
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="age"
+
+
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="parents_consent"
+
+            on
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj
+            Content-Disposition: form-data; name="privacy"
+
+            on
+            ------WebKitFormBoundaryJBxGtknRPIBvH5oj--
+            """
+        ),
+    )
+
+
+def test_register_adult(client: Client, adult_registration: RequestData):
     # TODO(sven): Can we read the full request with header and body?
-    response = client.get("/adult-registration")
+    response = client.post(
+        "/trial-registration",
+        headers=adult_registration.headers,
+        body=adult_registration.body,
+    )
     assert response.status == 200
-    assert response.json is not None
-    assert response.flat_json()["message"] == "Email sent."
-    assert len(client.context.smtp_stub.mails) == 2
+    assert response.json()["message"] == "Email sent."
+    assert client.app.context.mailer.send.call_count == 2
 
-    registration_mail = client.context.smtp_stub.mails[0]
-    assert registration_mail.subject == "Anmeldung zum Probetraining: Erwachsene"
-    assert "Name: sven mkw" in registration_mail.body
-    assert "Alter: 23" in registration_mail.body
-    assert "Email: sven.mkw@gmail.com" in registration_mail.body
-    assert "Telefon: 123456789" in registration_mail.body
+    registration_mail = client.app.context.mailer.send.call_args_list[0].args[0]
+    assert registration_mail["Subject"] == "Anmeldung zum Probetraining: Erwachsene"
+    body = registration_mail.get_content()
+    assert "Name: sven mkw" in body
+    assert "Alter: 23" in body
+    assert "Email: sven.mkw@gmail.com" in body
+    assert "Telefon: 123456789" in body
 
-    acknowledgement_mail = client.context.smtp_stub.mails[1]
+    acknowledgement_mail = client.app.context.mailer.send.call_args_list[1].args[0]
     assert (
-        acknowledgement_mail.subject
+        acknowledgement_mail["Subject"]
         == "Joshinkan Werder Karate - Anmeldung zum Probetraining"
     )
-    assert "Hallo sven" in acknowledgement_mail.body
-    assert (
-        "Vielen Dank für die Anmeldung zum Probetraining." in acknowledgement_mail.body
+    body = acknowledgement_mail.get_content()
+    assert "Hallo sven" in body
+    assert "Vielen Dank für die Anmeldung zum Probetraining." in body
+
+
+def test_register_no_privacy(client: Client, register_no_privacy: RequestData):
+    response = client.post(
+        "/trial-registration",
+        headers=register_no_privacy.headers,
+        body=register_no_privacy.body,
     )
-
-
-def test_register_no_privacy(client):
-    response = client.request("registration-no-privacy")
     assert response.status == 400
-    assert response.json is not None
-    assert response.flat_json()["error"] == "Form data could not be parsed."
-
-    text = response.read()
-    assert "400 Bad Request" in text
+    assert "'privacy' is off" in response.json()["message"]
 
 
-def test_register_child(client):
-    response = client.request("child-registration")
+def test_register_child(client: Client, child_registration: RequestData):
+    response = client.post(
+        "/trial-registration",
+        headers=child_registration.headers,
+        body=child_registration.body,
+    )
     assert response.status == 200
-    assert response.json is not None
-    assert response.flat_json()["message"] == "Email sent."
-    assert len(client.context.smtp_stub.mails) == 2
+    assert response.json()["message"] == "Email sent."
+    assert client.app.context.mailer.send.call_count == 2
 
-    registration_mail = client.context.smtp_stub.mails[0]
-    assert registration_mail.subject == "Anmeldung zum Probetraining: Kinder (1)"
-    assert "Name: Boi Fam" in registration_mail.body
-    assert "Alter: 17" in registration_mail.body
-    assert "Name: Girl Fam" not in registration_mail.body
-    assert "Alter: 16" not in registration_mail.body
-    assert "Name: Dad Fam" in registration_mail.body
-    assert "Email: fam@mail.com" in registration_mail.body
-    assert "Telefon: 04912847" in registration_mail.body
+    registration_mail = client.app.context.mailer.send.call_args_list[0].args[0]
+    assert registration_mail["Subject"] == "Anmeldung zum Probetraining: Kinder (1)"
+    body = registration_mail.get_content()
+    assert "Name: Boi Fam" in body
+    assert "Alter: 17" in body
+    assert "Name: Girl Fam" not in body
+    assert "Alter: 16" not in body
+    assert "Name: Dad Fam" in body
+    assert "Email: fam@mail.com" in body
+    assert "Telefon: 04912847" in body
+    assert registration_mail["From"] == "sender@example.com"
 
-    acknowledgement_mail = client.context.smtp_stub.mails[1]
+    acknowledgement_mail = client.app.context.mailer.send.call_args_list[1].args[0]
     assert (
-        acknowledgement_mail.subject
+        acknowledgement_mail["Subject"]
         == "Joshinkan Werder Karate - Anmeldung zum Probetraining"
     )
-    assert "Liebe Familie Fam" in acknowledgement_mail.body
-    assert (
-        "Vielen Dank für die Anmeldung von Boi zum Probetraining."
-        in acknowledgement_mail.body
+    body = acknowledgement_mail.get_content()
+    assert "Liebe Familie Fam" in body
+    print(body)
+    assert "Vielen Dank für die Anmeldung von Boi zum Probetraining." in body
+
+
+def test_register_children(client: Client, children_registration: RequestData):
+    response = client.post(
+        "/trial-registration",
+        headers=children_registration.headers,
+        body=children_registration.body,
     )
-
-
-def test_register_children(client):
-    response = client.request("children-registration")
     assert response.status == 200
-    assert response.json is not None
-    assert response.flat_json()["message"] == "Email sent."
-    assert len(client.context.smtp_stub.mails) == 2
+    assert response.json()["message"] == "Email sent."
+    assert client.app.context.mailer.send.call_count == 2
 
-    registration_mail = client.context.smtp_stub.mails[0]
-    assert registration_mail.subject == "Anmeldung zum Probetraining: Kinder (2)"
-    assert "Name: Boi Fam" in registration_mail.body
-    assert "Alter: 17" in registration_mail.body
-    assert "Name: Girl Fam" in registration_mail.body
-    assert "Alter: 16" in registration_mail.body
-    assert "Name: Dad Fam" in registration_mail.body
-    assert "Email: fam@mail.com" in registration_mail.body
-    assert "Telefon: 049127495" in registration_mail.body
+    registration_mail = client.app.context.mailer.send.call_args_list[0].args[0]
+    assert registration_mail["Subject"] == "Anmeldung zum Probetraining: Kinder (2)"
+    body = registration_mail.get_content()
+    assert "Name: Boi Fam" in body
+    assert "Alter: 17" in body
+    assert "Name: Girl Fam" in body
+    assert "Alter: 16" in body
+    assert "Name: Dad Fam" in body
+    assert "Email: fam@mail.com" in body
+    assert "Telefon: 049127495" in body
 
-    acknowledgement_mail = client.context.smtp_stub.mails[1]
+    acknowledgement_mail = client.app.context.mailer.send.call_args_list[1].args[0]
     assert (
-        acknowledgement_mail.subject
+        acknowledgement_mail["Subject"]
         == "Joshinkan Werder Karate - Anmeldung zum Probetraining"
     )
-    assert "Liebe Familie Fam" in acknowledgement_mail.body
-    assert (
-        "Vielen Dank für die Anmeldung von Boi und Girl zum Probetraining."
-        in acknowledgement_mail.body
-    )
-
-
-def test_send_email_adult():
-    smtp_email = "your_smtp_email"
-    smtp_password = "your_smtp_password"
-    smtp_host = "smtps://smtp.gmail.com:465"
-
-    smtp = SMTP(email=smtp_email, password=smtp_password, hostname=smtp_host)
-    context = ServerContext(
-        domain="http://localhost:3000",
-        sender=User(name="Sender", email=smtp_email),
-        smtp=smtp,
-        reply_to=User(name="ReplyTo", email="sven.mkw+replyto@gmail.com"),
-        cc=[User(name="CC1", email="sven.mkw+cc1@gmail.com")],
-        bcc=[User(name="CC2", email="sven.mkw+bcc1@gmail.com")],
-    )
-    client = Client(context=context)
-    response = client.request("adult-registration")
-    assert response.status == 200
-    assert response.json is not None
-    assert response.flat_json()["message"] == "Email sent."
-
-
-def test_send_email_children():
-    smtp_email = "your_smtp_email"
-    smtp_password = "your_smtp_password"
-    smtp_host = "smtps://smtp.gmail.com:465"
-
-    smtp = SMTP(email=smtp_email, password=smtp_password, hostname=smtp_host)
-    context = ServerContext(
-        domain="http://localhost:3000",
-        sender=User(name="Sender", email=smtp_email),
-        smtp=smtp,
-        reply_to=User(name="ReplyTo", email="sven.mkw+replyto@gmail.com"),
-        cc=[User(name="CC1", email="sven.mkw+cc1@gmail.com")],
-        bcc=[User(name="CC2", email="sven.mkw+bcc1@gmail.com")],
-    )
-    client = Client(context=context)
-    response = client.request("children-registration")
-    assert response.status == 200
-    assert response.json is not None
-    assert response.flat_json()["message"] == "Email sent."
+    body = acknowledgement_mail.get_content()
+    assert "Liebe Familie Fam" in body
+    assert "Vielen Dank für die Anmeldung von Boi und Girl zum Probetraining." in body

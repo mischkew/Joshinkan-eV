@@ -47,6 +47,10 @@ def serve_gunicorn() -> None:
             --worksers 1. Default: False"""
         ),
     )
+    parser.add_argument(
+        "--log-dir",
+        help="Store gunicorn access and error logs in this directory. Default: Log to stdout",
+    )
 
     args = parser.parse_args()
 
@@ -64,6 +68,12 @@ def serve_gunicorn() -> None:
             "--timeout": 0 if args.debug else None,
             "--worker-class": None if args.debug else "gevent",
             "--bind": f"{args.host}:{args.port}",
+            "--access-logfile": f"{args.log_dir}/gunicorn-access.log"
+            if args.log_dir
+            else "-",
+            "--error-logfile": f"{args.log_dir}/gunicorn-error.log"
+            if args.log_dir
+            else "-",
             "'joshinkan.app:build_app()'": "",
         },
     )

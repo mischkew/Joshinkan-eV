@@ -437,7 +437,7 @@
             let errorElement = document.getElementById("form-backend-error")
             try {
               let json = await response.json();
-              errorElement.innerText = json.error;
+              errorElement.innerText = json.message;
             } catch(error) {
               console.log(error);
               errorElement.innerText = "Serverseitiger Fehler. Versuche es später nochmal oder schreibe uns direkt eine Email.";
