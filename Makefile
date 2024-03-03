@@ -34,9 +34,6 @@ endif
 ifndef LOGS_DIR
 $(error Variable LOGS_DIR is not set. Check .env or define environment variable)
 endif
-ifndef NGINX_PID_PATH
-$(error Variable NGINX_PID_PATH is not set. Check .env or define environment variable)
-endif
 
 # Checks if the currently used environment is local. Otherwise exits.
 require-local:
@@ -114,8 +111,8 @@ reload-nginx: .should-reload | require-local
 
 .PHONY: status-nginx
 status-nginx: | require-local
-	@if [ -f $(NGINX_PID_PATH) ]; then \
-		(ps -p $$(cat $(NGINX_PID_PATH)) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
+	@if [ -f $(BUILD_DIR)/nginx.pid ]; then \
+		(ps -p $$(cat $(BUILD_DIR)/nginx.pid) >& /dev/null && echo "nginx running") || echo "nginx not running"; \
 	else \
 		echo "nginx not running"; \
 	fi
