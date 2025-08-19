@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <title>Kontakt</title>
+    {{ cat templates/metadata.html }}
+  </head>
+  <body>
+    {{ include.sh templates/header.html }}
+
+    <main>
+
+      <a
+        class="scroll-top"
+        href="#header"
+        data-scroll="true"
+        data-scroll-time="1000"
+        data-show-after="#anmeldung">
+        <span class="glyphicon glyphicon-circle-arrow-up"></span>
+      </a>
+
+      <h1 class="red" id="title">Mitglied werden</h1>
+
+      <!-- anmeldung -->
+      <section id="anmeldung">
+        <article>
+          <h2>Online Mitgliedsantrag</h2>
+          <p>
+            <b>
+              Bitte melde dich nur an, nachdem du bereits
+              beim <a href="/probe-training">Probetraining</a> warst.
+            </b>
+          </p>
+          <p>
+            <a class="primary-button" href="https://docs.google.com/forms/d/e/1FAIpQLSepWIfdn1Sdgvsxm36pbHdkDOrxqh_N0uKv5bvfH6QPsB9-0g/viewform?usp=header" target="_blank">
+                Mitgliedsantrag ausfüllen
+            </a>
+          </p>
+        </article>
+      </section>
+      <!-- end anmeldung -->
+
+    </main>
+
+    {{ include.sh templates/footer.html }}
+  </body>
+</html>
